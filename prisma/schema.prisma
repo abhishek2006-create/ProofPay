@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+}
+enum Role {
+  CLIENT
+  FREELANCER
+}
+enum MilestoneStatus {
+  DRAFT
+  AGREED
+  SUBMITTED
+  UNDER_REVIEW
+  REVISION_REQUESTED
+  ACCEPTED
+  REJECTED
+}
+enum PaymentStatus {
+  CREATED
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+model User {
+  id String @id @default(cuid())
+  name String
+  email String @unique
+  passwordHash String
+  role Role
+  sessionVersion Int @default(0)
+  zapierConsent Boolean @default(false)
+  elasticConsent Boolean @default(false)
+  createdAt DateTime @default(now())
+  clientProjects Project[] @relation("Client")
+  freelancerProjects Project[] @relation("Freelancer")
+}
+model Project {
+  id String @id @default(cuid())
+  title String
+  description String
+  clientId String
+  freelancerId String
+  client User @relation("Client", fields:[clientId], references:[id])
+  freelancer User @relation("Freelancer", fields:[freelancerId], references:[id])
+  createdAt DateTime @default(now())
+  milestones Milestone[]
+  auditEvents AuditEvent[]
+  documents ProjectDocument[]
+  @@index([clientId])
+  @@index([freelancerId])
+}
+model Milestone {
+  id String @id @default(cuid())
+  projectId String
+  project Project @relation(fields:[projectId], references:[id])
+  title String
+  description String
+  amountMinor Int
+  currency String @default("USD")
+  dueDate DateTime
+  status MilestoneStatus @default(DRAFT)
+  currentVersion Int @default(1)
+  revision Int @default(0)
+  createdAt DateTime @default(now())
+  specifications Specification[]
+  submissions Submission[]
+  runs VerificationRun[]
+  decisions AcceptanceDecision[]
+  payment Payment?
+  evaluations EvaluationJob[]
+  @@index([projectId])
+}
+model Specification {
+  id String @id @default(cuid())
+  milestoneId String
+  milestone Milestone @relation(fields:[milestoneId], references:[id])
+  version Int
+  clientAgreedAt DateTime?
+  freelancerAgreedAt DateTime?
+  createdAt DateTime @default(now())
+  requirements Requirement[]
+  @@unique([milestoneId,version])
+}
+model Requirement {
+  id String @id @default(cuid())
+  specificationId String
+  specification Specification @relation(fields:[specificationId], references:[id])
+  description String
+  method String
+  expected String
+  evidenceRequired String
+  weight Int @default(1)
+  sourceChunkId String?
+  sourceQuote String?
+  sourceChunk DocumentChunk? @relation(fields:[sourceChunkId],references:[id])
+  @@index([specificationId])
+}
+model Submission {
+  id String @id @default(cuid())
+  milestoneId String
+  milestone Milestone @relation(fields:[milestoneId], references:[id])
+  submittedBy String
+  version Int
+  notes String
+  repositoryUrl String?
+  repositoryRef String?
+  commitSha String?
+  treeSha String?
+  setupInstructions String @default("")
+  createdAt DateTime @default(now())
+  evidence Evidence[]
+  runs VerificationRun[]
+  @@index([milestoneId])
+}
+model Evidence {
+  id String @id @default(cuid())
+  submissionId String
+  submission Submission @relation(fields:[submissionId], references:[id])
+  requirementId String
+  filename String
+  mimeType String
+  content Bytes
+  sha256 String
+  createdAt DateTime @default(now())
+  @@index([submissionId])
+}
+model VerificationRun {
+  id String @id @default(cuid())
+  milestoneId String
+  milestone Milestone @relation(fields:[milestoneId], references:[id])
+  submissionId String
+  submission Submission @relation(fields:[submissionId], references:[id])
+  version Int
+  modelProvider String
+  modelVersion String?
+  summary String
+  results Json
+  aiResults Json?
+  report Json?
+  createdAt DateTime @default(now())
+  @@index([milestoneId])
+}
+model AcceptanceDecision {
+  id String @id @default(cuid())
+  milestoneId String
+  milestone Milestone @relation(fields:[milestoneId], references:[id])
+  clientId String
+  decision String
+  comment String
+  version Int
+  createdAt DateTime @default(now())
+  @@index([milestoneId])
+}
+model Payment {
+  id String @id @default(uuid())
+  milestoneId String @unique
+  milestone Milestone @relation(fields:[milestoneId], references:[id])
+  status PaymentStatus @default(CREATED)
+  amountMinor Int
+  baseAmountMinor Int @default(0)
+  tipMinor Int @default(0)
+  currency String
+  merchantId String
+  paypalOrderId String? @unique
+  paypalCaptureId String? @unique
+  approvalUrl String?
+  attempt Int @default(1)
+  busyUntil DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model WebhookEvent {
+  id String @id
+  eventType String
+  processedAt DateTime @default(now())
+}
+model AuditEvent {
+  id String @id @default(cuid())
+  projectId String
+  project Project @relation(fields:[projectId], references:[id])
+  actorId String
+  milestoneId String?
+  type String
+  metadata Json
+  createdAt DateTime @default(now())
+  @@index([projectId,createdAt])
+}
+model RateLimit {
+  key String @id
+  count Int
+  resetAt DateTime
+}
+model Delivery {
+  id String @id
+  projectId String
+  status String @default("PENDING")
+  attempts Int @default(0)
+  payload Json
+  createdAt DateTime @default(now())
+}
+model ProjectDocument {
+  id String @id @default(cuid())
+  projectId String
+  project Project @relation(fields:[projectId],references:[id])
+  milestoneId String?
+  uploadedBy String
+  filename String
+  mimeType String
+  sha256 String
+  content Bytes
+  status String
+  embeddingModel String?
+  createdAt DateTime @default(now())
+  chunks DocumentChunk[]
+  @@index([projectId,milestoneId])
+}
+model DocumentChunk {
+  id String @id @default(cuid())
+  documentId String
+  document ProjectDocument @relation(fields:[documentId],references:[id])
+  projectId String
+  milestoneId String?
+  ordinal Int
+  sourceLocation String
+  text String
+  embedding Float[] @default([])
+  embeddingModel String?
+  requirements Requirement[]
+  @@unique([documentId,ordinal])
+  @@index([projectId,milestoneId])
+}
+model EvaluationJob {
+  id String @id @default(uuid())
+  milestoneId String
+  milestone Milestone @relation(fields:[milestoneId],references:[id])
+  submissionId String
+  actorId String
+  status String @default("RUNNING")
+  stage String
+  events Json
+  reportRunId String?
+  error String?
+  leaseUntil DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([milestoneId,createdAt])
+}

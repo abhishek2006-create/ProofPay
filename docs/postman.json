@@ -1,0 +1,98 @@
+{
+  "info": {
+    "name": "ProofPay local API smoke tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "No secrets. Runs against a running local server. Does not simulate completed sandbox payments."
+  },
+  "variable": [{ "key": "baseUrl", "value": "http://localhost:3000" }],
+  "item": [
+    {
+      "name": "Database health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/health" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('PostgreSQL is ready',()=>pm.response.to.have.status(200));",
+              "pm.test('Health body',()=>pm.expect(pm.response.json().status).to.eql('ok'));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unauthenticated projects denied",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/projects" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('Authentication enforced',()=>pm.response.to.have.status(401));"],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Anonymous session",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/me" },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Anonymous identity is null',()=>pm.expect(pm.response.json().user).to.eql(null));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cross origin write rejected",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Origin", "value": "https://untrusted.example" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/api/v1/register",
+        "body": { "mode": "raw", "raw": "{}" }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": ["pm.test('CSRF boundary enforced',()=>pm.response.to.have.status(403));"],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook signature headers required",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/api/v1/paypal-webhook",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"id\":\"NOT-A-REAL-EVENT\",\"event_type\":\"PAYMENT.CAPTURE.COMPLETED\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Unsigned webhook is never accepted',()=>pm.expect([400,401,503]).to.include(pm.response.code));"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

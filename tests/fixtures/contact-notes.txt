@@ -1,0 +1,1 @@
+Manual review required: exercise form validation and confirm actual message receipt. This note is not proof that a backend works.

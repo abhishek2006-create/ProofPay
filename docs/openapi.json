@@ -1,0 +1,804 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ProofPay API",
+    "version": "1.1.0",
+    "description": "Handwritten core contract. See API.md for complete routes. Not generated or validated by APIMatic."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "next-auth.session-token"
+      }
+    },
+    "schemas": {
+      "Requirement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["description", "method", "expected", "evidenceRequired"],
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "method": {
+            "type": "string",
+            "enum": ["TEXT_CONTAINS", "JSON_VALUE", "MANUAL", "REPO_FILE", "SANDBOX_TEST"]
+          },
+          "expected": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "evidenceRequired": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 300
+          },
+          "weight": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000,
+            "default": 1
+          },
+          "sourceChunkId": {
+            "type": ["string", "null"]
+          },
+          "sourceQuote": {
+            "type": ["string", "null"],
+            "maxLength": 1000
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "session": []
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Database ready"
+          },
+          "503": {
+            "description": "Database unavailable"
+          }
+        }
+      }
+    },
+    "/projects": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Authorized project list"
+          },
+          "401": {
+            "description": "Unauthenticated"
+          }
+        }
+      },
+      "post": {
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["title", "description", "freelancerEmail"],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 120
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 3000
+                  },
+                  "freelancerEmail": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Project persisted"
+          },
+          "403": {
+            "description": "Client required"
+          }
+        }
+      }
+    },
+    "/milestones/{id}/agree": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["revision", "confirm"],
+                "properties": {
+                  "revision": {
+                    "type": "integer"
+                  },
+                  "confirm": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agreement recorded"
+          },
+          "409": {
+            "description": "Stale or invalid milestone state"
+          }
+        }
+      }
+    },
+    "/milestones/{id}/order": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sandbox approval URL"
+          },
+          "409": {
+            "description": "Acceptance required or already paid"
+          },
+          "503": {
+            "description": "Sandbox unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "tip": {
+                    "type": "string",
+                    "pattern": "^(?:0|[1-9][0-9]{0,5})\\.[0-9]{2}$",
+                    "default": "0.00"
+                  }
+                },
+                "required": []
+              }
+            }
+          }
+        },
+        "description": "Accepted client only; server freezes base+tip. No client-supplied total is allowed. Buyer sandbox approval is separate from capture."
+      }
+    },
+    "/milestones/{id}/capture": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Backend-reconciled status"
+          },
+          "403": {
+            "description": "Client required"
+          },
+          "409": {
+            "description": "Approval required"
+          }
+        }
+      }
+    },
+    "/paypal-webhook": {
+      "post": {
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified event processed or already processed"
+          },
+          "401": {
+            "description": "Signature invalid"
+          },
+          "503": {
+            "description": "Verification unavailable"
+          }
+        }
+      }
+    },
+    "/projects/{id}/documents": {
+      "post": {
+        "summary": "Client uploads requirements, with explicit processing consent",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "201": {
+            "description": "Document parsed; indexing availability is explicit"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "document": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "consent": {
+                    "type": "string",
+                    "const": "true"
+                  },
+                  "milestoneId": {
+                    "type": "string"
+                  }
+                },
+                "required": ["document", "consent"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents/{id}": {
+      "get": {
+        "summary": "Members read parsed source chunks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        }
+      }
+    },
+    "/projects/{id}/requirements": {
+      "get": {
+        "summary": "Project-filtered semantic retrieval or explicit lexical fallback",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 4000
+            }
+          },
+          {
+            "in": "query",
+            "name": "milestoneId",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        }
+      }
+    },
+    "/projects/{id}/extract-criteria": {
+      "post": {
+        "summary": "Propose exact-cited editable criteria",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 4000
+                  },
+                  "milestoneId": {
+                    "type": "string"
+                  },
+                  "consent": {
+                    "const": true
+                  }
+                },
+                "required": ["query", "consent"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        }
+      }
+    },
+    "/milestones/{id}/evaluation": {
+      "get": {
+        "summary": "Real persisted latest job progress",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        }
+      }
+    },
+    "/milestones/{id}/verify": {
+      "post": {
+        "summary": "Evaluate current submission; persist detailed report without automatic approval or payment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        }
+      }
+    },
+    "/milestones/{id}/decision": {
+      "post": {
+        "summary": "Client decision with mandatory reason",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision": {
+                    "type": "integer"
+                  },
+                  "decision": {
+                    "enum": ["ACCEPTED", "REVISION_REQUESTED", "REJECTED"]
+                  },
+                  "comment": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 3000
+                  },
+                  "confirm": {
+                    "const": true
+                  }
+                },
+                "required": ["revision", "decision", "comment", "confirm"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        }
+      }
+    },
+    "/milestones/{id}/submit": {
+      "post": {
+        "summary": "Freelancer submits files and/or an authorized GitHub ref; server pins commit/tree",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "Origin",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Authorized operation completed"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Session required"
+          },
+          "403": {
+            "description": "Role required"
+          },
+          "404": {
+            "description": "Project resource unavailable"
+          },
+          "409": {
+            "description": "Current state does not allow operation"
+          },
+          "503": {
+            "description": "External service unavailable"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "revision": {
+                    "type": "string"
+                  },
+                  "notes": {
+                    "type": "string",
+                    "maxLength": 5000
+                  },
+                  "repositoryUrl": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "repositoryRef": {
+                    "type": "string",
+                    "maxLength": 200
+                  },
+                  "repositoryConsent": {
+                    "type": "string",
+                    "enum": ["true"]
+                  },
+                  "setupInstructions": {
+                    "type": "string",
+                    "maxLength": 3000
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  },
+                  "requirementIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["revision"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

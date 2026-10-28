@@ -1,0 +1,2 @@
+Design for a brighter web
+This is a supplied text artifact. It does not prove a deployed homepage renders correctly.

@@ -1,0 +1,432 @@
+{
+  "timestamp": "2026-10-28T10:28:13.690Z",
+  "datasetSize": 60,
+  "mode": "deterministic only; not an AI benchmark",
+  "model": null,
+  "artifactAccuracy": 1,
+  "falseArtifactPassRate": 0,
+  "evidenceReferenceValidity": 1,
+  "limitations": "Synthetic artifact fixtures; passing artifact checks does not establish deployed behavior or contractual adequacy. No measured manual baseline. Contradictory artifacts deliberately demonstrate text-check limitations.",
+  "outputs": [
+    {
+      "id": "case-0",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-1",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-2",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-3",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-4",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-5",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-6",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-7",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-8",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-9",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-10",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-11",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-12",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-13",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-14",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-15",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-16",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-17",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-18",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-19",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-20",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-21",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-22",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-23",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-24",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-25",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-26",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-27",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-28",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-29",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-30",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-31",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-32",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-33",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-34",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-35",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-36",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-37",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-38",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-39",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-40",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-41",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-42",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-43",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-44",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-45",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-46",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-47",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-48",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-49",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-50",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-51",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-52",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-53",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-54",
+      "kind": "clear artifact pass",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    },
+    {
+      "id": "case-55",
+      "kind": "clear artifact failure",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-56",
+      "kind": "missing evidence",
+      "expected": "not_verified",
+      "actual": "not_verified",
+      "ai": null
+    },
+    {
+      "id": "case-57",
+      "kind": "human review",
+      "expected": "needs_review",
+      "actual": "needs_review",
+      "ai": null
+    },
+    {
+      "id": "case-58",
+      "kind": "prompt injection",
+      "expected": "fail",
+      "actual": "fail",
+      "ai": null
+    },
+    {
+      "id": "case-59",
+      "kind": "contradictory artifact",
+      "expected": "pass",
+      "actual": "pass",
+      "ai": null
+    }
+  ]
+}

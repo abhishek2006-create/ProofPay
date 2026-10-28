@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "ProofPay PayPal SANDBOX setup (manual)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Manual sandbox-only reference. Supply secrets locally in Postman, never export populated values. Approval must occur through PayPal and captures should use the application backend."
+  },
+  "variable": [
+    { "key": "sandboxClientId", "value": "" },
+    { "key": "sandboxClientSecret", "value": "" },
+    { "key": "sandboxAccessToken", "value": "" },
+    { "key": "orderId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Sandbox OAuth token",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{sandboxClientId}}", "type": "string" },
+            { "key": "password", "value": "{{sandboxClientSecret}}", "type": "string" }
+          ]
+        },
+        "url": "https://api-m.sandbox.paypal.com/v1/oauth2/token",
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [{ "key": "grant_type", "value": "client_credentials" }]
+        }
+      }
+    },
+    {
+      "name": "Read sandbox order",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{sandboxAccessToken}}", "type": "string" }]
+        },
+        "url": "https://api-m.sandbox.paypal.com/v2/checkout/orders/{{orderId}}"
+      }
+    }
+  ]
+}

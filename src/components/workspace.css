@@ -1,0 +1,1135 @@
+/* Signed-in workspace. Keep the public landing page's design independent. */
+.app-shell {
+  --muted: #62748c;
+  --line: #e0e8f3;
+  background: #f4f7fc;
+  color: #172b49;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.app-shell .sidebar {
+  width: 244px;
+  padding: 30px 18px 18px;
+  background: linear-gradient(180deg, #ffffff, #f7faff);
+}
+.app-shell .sidebar > .brand {
+  font-size: 25px;
+  margin-bottom: 34px;
+}
+.app-shell .workspace-name {
+  background: #f2f6fc;
+  border-color: #e3ebf5;
+  padding: 14px 12px;
+  border-radius: 13px;
+}
+.app-shell .workspace-name strong,
+.app-shell .profile strong {
+  font-size: 13px;
+}
+.app-shell .workspace-name small,
+.app-shell .profile small {
+  font-size: 11px;
+}
+.app-shell .workspace-avatar {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #d8e6fb;
+  background: white;
+  border-radius: 10px;
+}
+.app-shell .nav-caption {
+  font-size: 10px;
+  color: #7d8da5;
+}
+.app-shell .nav-item {
+  gap: 12px;
+  min-height: 47px;
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #60718c;
+  border-radius: 11px;
+  margin: 6px 0;
+  transition:
+    background 0.18s,
+    color 0.18s;
+}
+.app-shell .nav-item.active {
+  color: white;
+  background: linear-gradient(100deg, #2563eb, #3b82f6);
+  box-shadow: 0 6px 16px #2563eb25;
+}
+.app-shell .nav-item.active .count {
+  background: #ffffff28;
+  color: white;
+}
+.app-shell .sandbox-card {
+  border-radius: 14px;
+  background: #edf5ff;
+  border-color: #dceafb;
+  padding: 17px;
+}
+.app-shell .sandbox-card strong {
+  font-size: 12px;
+}
+.app-shell .sandbox-card p {
+  font-size: 11px;
+  color: #627994;
+}
+.app-shell .avatar {
+  width: 38px;
+  height: 38px;
+  font-size: 12px;
+  background: #e5efff;
+  color: #285cb7;
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px #dce7f7;
+}
+.app-shell .workspace-content {
+  margin-left: 244px;
+}
+.app-shell .app-header {
+  height: 82px;
+  padding: 0 38px;
+  background: #ffffffed;
+}
+.app-shell .app-header .breadcrumbs {
+  font-size: 12px;
+  min-width: 0;
+}
+.app-shell .breadcrumbs > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-shell .app-header .header-actions {
+  gap: 22px;
+  flex-shrink: 0;
+}
+.app-shell .header-actions > .badge {
+  display: inline-flex;
+  gap: 6px;
+}
+.app-shell .header-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2e405c;
+  font-size: 12px;
+  font-weight: 600;
+}
+.app-shell .header-account small {
+  display: block;
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 10px;
+  padding-top: 2px;
+}
+.app-shell .environment-dot {
+  width: 5px;
+  height: 5px;
+  background: #4383f1;
+  border-radius: 50%;
+}
+.app-shell .mobile-signout {
+  display: none;
+}
+.app-shell .workspace-main {
+  max-width: 1500px;
+  padding: 34px 38px 44px;
+}
+.app-shell .page-heading h1 {
+  font-size: clamp(28px, 2.6vw, 38px);
+  letter-spacing: -1.3px;
+  margin-bottom: 12px;
+}
+.app-shell .page-heading p {
+  font-size: 14px;
+  color: #60738d;
+  line-height: 1.7;
+}
+.app-shell .page-heading .eyebrow {
+  font-size: 10px;
+  letter-spacing: 1.7px;
+  color: #55779f;
+}
+.app-shell .overview-heading {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 206px;
+  padding: 32px 34px;
+  border: 1px solid #d9e8fb;
+  border-radius: 22px;
+  background: linear-gradient(110deg, #e5f0ff 0%, #eef7ff 62%, #e1efff);
+  margin-bottom: 24px;
+}
+.app-shell .overview-heading:after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  right: -60px;
+  top: -90px;
+  width: 340px;
+  height: 340px;
+  border: 44px solid #ffffff55;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 42px #ffffff25,
+    0 0 0 84px #ffffff20;
+}
+.app-shell .overview-heading h1 {
+  font-size: 40px;
+}
+.app-shell .overview-heading .btn {
+  box-shadow: 0 6px 18px #2563eb25;
+}
+.app-shell .btn {
+  border-radius: 10px;
+  font-size: 13px;
+  padding: 11px 17px;
+  min-height: 44px;
+}
+.app-shell .btn.primary {
+  background: linear-gradient(105deg, #2563eb, #367bf2);
+  border-color: #2b6de7;
+  box-shadow: 0 4px 10px #2563eb18;
+}
+.app-shell .btn.primary:hover:not(:disabled) {
+  background: #1c56d4;
+}
+.app-shell .badge {
+  border-radius: 7px;
+  padding: 5px 9px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15px;
+}
+.app-shell .stats-grid {
+  gap: 16px;
+  margin-bottom: 34px;
+}
+.app-shell .stat {
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 3px 14px #1d3c6a04;
+  position: relative;
+  overflow: hidden;
+}
+.app-shell .stat > div {
+  color: #60718a;
+  font-size: 12px;
+}
+.app-shell .stat > div > svg {
+  box-sizing: content-box;
+  padding: 9px;
+  width: 19px;
+  height: 19px;
+  background: #edf4ff;
+  color: #3477e4;
+  border-radius: 10px;
+}
+.app-shell .stat:nth-child(2) > div > svg {
+  background: #fff5e5;
+  color: #c58b25;
+}
+.app-shell .stat:nth-child(3) > div > svg {
+  background: #e9f8f2;
+  color: #279975;
+}
+.app-shell .stat:nth-child(4) > div > svg {
+  background: #f1edff;
+  color: #8570c6;
+}
+.app-shell .stat > strong {
+  font-size: 34px;
+  letter-spacing: -1px;
+  font-weight: 650;
+  margin: 12px 0 9px;
+}
+.app-shell .stat > small {
+  color: #76869c;
+  font-size: 11px;
+}
+.app-shell .project-library-heading {
+  margin-bottom: 4px;
+}
+.app-shell .project-library-heading h2 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+.app-shell .project-library-heading p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.app-shell .list-toolbar {
+  align-items: center;
+  margin: 20px 0 24px;
+  gap: 12px;
+}
+.app-shell .search-field {
+  max-width: none;
+  border-radius: 11px;
+  min-height: 46px;
+}
+.app-shell .search-field input,
+.app-shell .list-toolbar > select {
+  font-size: 12px;
+}
+.app-shell .list-toolbar > select {
+  min-height: 46px;
+  border-color: var(--line);
+  border-radius: 10px;
+}
+.app-shell .project-grid {
+  gap: 22px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.app-shell .project-card {
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 4px 18px #1d3c6a05;
+  transition:
+    transform 0.18s,
+    box-shadow 0.18s,
+    border-color 0.18s;
+}
+.app-shell .project-card:hover {
+  transform: translateY(-3px);
+  border-color: #b2cef3;
+  box-shadow: 0 12px 30px #244d8110;
+}
+.app-shell .project-card-top {
+  margin-bottom: 20px;
+}
+.app-shell .folder-icon {
+  width: 48px;
+  height: 48px;
+  background: #eaf3ff;
+  border-radius: 13px;
+  color: #3574d5;
+}
+.app-shell .project-card h3 {
+  font-size: 19px;
+  letter-spacing: -0.4px;
+  margin-bottom: 8px;
+}
+.app-shell .project-card > p {
+  font-size: 13px;
+  line-height: 1.7;
+  min-height: 44px;
+  margin-bottom: 24px;
+}
+.app-shell .project-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #74839a;
+  font-size: 11px;
+}
+.app-shell .project-progress-label strong {
+  font-size: 11px;
+  color: #405b7f;
+  font-weight: 600;
+}
+.app-shell .project-progress {
+  height: 6px;
+  margin: 10px 0 20px;
+  background: #eaf0f8;
+}
+.app-shell .project-progress > span {
+  background: linear-gradient(90deg, #5c9cff, #2563eb);
+}
+.app-shell .project-card-bottom {
+  padding-top: 16px;
+  border-top: 1px solid #edf1f7;
+  font-size: 11px;
+}
+.app-shell .project-collaborator {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.app-shell .collaborator-avatar {
+  display: inline-flex;
+  width: 27px;
+  height: 27px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e9f1fd;
+  font-size: 9px;
+  font-weight: 600;
+  color: #5278ae;
+  flex-shrink: 0;
+}
+.app-shell .workspace-tip {
+  background: #eaf3ff;
+  border-color: #dce9fb;
+  border-radius: 14px;
+  align-items: center;
+  margin-top: 26px;
+}
+.app-shell .workspace-tip strong {
+  font-size: 13px;
+  color: #365e91;
+}
+.app-shell .workspace-tip p {
+  font-size: 12px;
+  color: #647c9b;
+}
+.app-shell .panel {
+  padding: 25px;
+  border-radius: 17px;
+  border-color: #e0e8f3;
+  box-shadow: 0 3px 14px #1d3c6a04;
+}
+.app-shell .panel-heading h2,
+.app-shell .panel > h2 {
+  font-size: 17px;
+}
+.app-shell .panel p,
+.app-shell .panel-caption {
+  font-size: 13px;
+}
+.app-shell .panel small,
+.app-shell .panel .muted {
+  font-size: 12px;
+}
+.app-shell .back {
+  color: #607b9c;
+  font-size: 12px;
+  margin-bottom: 22px;
+}
+.app-shell .project-people {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 19px 22px;
+  font-size: 12px;
+}
+.app-shell .section-heading {
+  margin-top: 30px;
+}
+.app-shell .milestone-list {
+  border-radius: 15px;
+  box-shadow: 0 3px 14px #1d3c6a04;
+}
+.app-shell .milestone-row {
+  padding: 22px;
+  min-width: 0;
+}
+.app-shell .milestone-row strong {
+  font-size: 14px;
+}
+.app-shell .milestone-row small {
+  font-size: 12px;
+}
+.app-shell .milestone-number {
+  background: #eaf3ff;
+  color: #4e82cb;
+  border-radius: 11px;
+  width: 38px;
+  height: 38px;
+  font-size: 12px;
+}
+.app-shell .stepper {
+  background: #ffffff;
+  padding: 19px 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  margin: 0 0 24px;
+}
+.app-shell .stepper li {
+  font-size: 12px;
+}
+.app-shell .review-layout {
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 22px;
+  align-items: start;
+}
+.app-shell .review-main {
+  min-width: 0;
+}
+.app-shell .review-summary {
+  top: 22px;
+  padding: 26px;
+  border-top: 3px solid #5c99ee;
+}
+.app-shell .review-summary > h2 {
+  font-size: 18px;
+}
+.app-shell .price {
+  font-size: 34px;
+  margin-bottom: 18px;
+}
+.app-shell dl {
+  font-size: 12px;
+  line-height: 1.6;
+  gap: 13px 18px;
+}
+.app-shell .review-summary dl {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.app-shell .agreement-state {
+  background: #f4f8fe;
+  border-radius: 10px;
+  padding: 15px;
+  border: 0;
+  font-size: 12px;
+  gap: 8px;
+}
+.app-shell .action-stack {
+  gap: 12px;
+}
+.app-shell .tip-fields {
+  width: 100%;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.app-shell .tip-fields p {
+  margin-bottom: 5px;
+}
+.app-shell .tip-fields > strong,
+.app-shell .tip-fields > small {
+  display: block;
+}
+.app-shell .tip-fields > small {
+  margin-top: 7px;
+  color: #687e99;
+  font-size: 11px;
+}
+.app-shell .payment-disclosure,
+.app-shell .disclosure {
+  font-size: 11px;
+  color: #667c98;
+  line-height: 1.75;
+}
+.app-shell .payment-disclosure > p {
+  font-size: 11px;
+}
+.app-shell .evaluation-progress {
+  padding: 16px 20px;
+  border-radius: 14px;
+  border-color: #d9e8fb;
+  background: #eaf3ff;
+  font-size: 12px;
+  margin-bottom: 22px;
+}
+.app-shell .evaluation-progress summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.app-shell .evaluation-progress summary strong {
+  text-transform: capitalize;
+  color: #315987;
+}
+.app-shell .evaluation-events {
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #d4e4f7;
+}
+.app-shell .evaluation-progress > .evaluation-events {
+  display: block;
+}
+.app-shell .evaluation-event {
+  display: flex;
+  gap: 12px;
+  padding: 6px 0;
+}
+.app-shell .evaluation-event small {
+  color: #7086a3;
+  white-space: nowrap;
+}
+.app-shell .evaluation-event span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.app-shell .evaluation-report {
+  margin: 0 0 22px;
+}
+.app-shell .report-score {
+  background: linear-gradient(115deg, #edf5ff, #f5faff);
+  border: 1px solid #e1ecfb;
+  border-radius: 14px;
+  padding: 22px;
+  gap: 20px;
+  margin: 18px 0;
+}
+.app-shell .report-score > strong {
+  color: #245eaa;
+  font-size: 35px;
+}
+.app-shell .report-score span {
+  font-size: 12px;
+  font-weight: 600;
+  color: #476789;
+}
+.app-shell .report-score small {
+  font-size: 11px;
+}
+.app-shell .evaluation-report > h3 {
+  margin: 25px 0 15px;
+  font-size: 15px;
+}
+.app-shell .evaluation-report > details {
+  padding: 15px 0;
+}
+.app-shell .evaluation-report summary {
+  font-size: 12px;
+  color: #425e80;
+}
+.app-shell .evaluation-report .report-metadata {
+  margin-top: 18px;
+}
+.app-shell .evaluation-report .score-policy {
+  font-size: 12px;
+}
+.app-shell .evaluation-report .criterion-evaluation {
+  background: #f8fafd;
+  border: 1px solid #e5edf7;
+  border-radius: 11px;
+  padding: 13px 15px;
+  margin-bottom: 9px;
+}
+.app-shell .criterion-evaluation summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-shell .criterion-evaluation summary:after {
+  content: '+';
+  color: #7994b5;
+  font-size: 17px;
+}
+.app-shell .criterion-evaluation[open] summary:after {
+  content: '−';
+}
+.app-shell .criterion-title {
+  flex: 1;
+  min-width: 0;
+}
+.app-shell .criterion-score {
+  color: #365b8b;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.app-shell .criterion-evaluation[open] summary {
+  margin-bottom: 14px;
+}
+.app-shell .criterion-weights {
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+}
+.app-shell .criterion-weights small {
+  font-size: 11px;
+  color: #6b7d95;
+}
+.app-shell .history-row {
+  padding: 17px 0;
+}
+.app-shell .history-row small,
+.app-shell .service-grid strong {
+  font-size: 12px;
+}
+.app-shell .service-grid > div {
+  border-radius: 14px;
+  padding: 23px;
+}
+.app-shell .ai-panel {
+  background: #f4f8ff;
+  border-color: #dce8fc;
+}
+.app-shell .ai-panel > small {
+  font-size: 11px;
+  color: #697e9d;
+}
+.app-shell .document-library {
+  margin: 25px 0;
+}
+.app-shell .document-library .panel-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-shell .document-library .panel-heading h2 > svg {
+  color: #5489d2;
+}
+.app-shell .document-upload {
+  border: 1px dashed #bdcee5;
+  border-radius: 12px;
+  padding: 20px;
+  background: #f7faff;
+  margin: 18px 0;
+}
+.app-shell .document-upload summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #436994;
+}
+.app-shell .document-upload summary span {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 400;
+  color: #7489a2;
+}
+.app-shell .document-upload form {
+  margin-top: 22px;
+}
+.app-shell input[type='file'] {
+  background: white;
+  font-size: 12px;
+  border-color: #dae5f2;
+  padding: 10px;
+}
+.app-shell input::file-selector-button {
+  border: 0;
+  background: #e8f1ff;
+  color: #3769ae;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-right: 14px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.app-shell .document-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.app-shell .document-item {
+  min-width: 0;
+  background: white;
+  border: 1px solid #e0e9f5;
+  padding: 15px;
+  gap: 8px;
+}
+.app-shell .document-item strong {
+  overflow-wrap: anywhere;
+  font-size: 13px;
+}
+.app-shell .document-item:hover {
+  background: #f1f7ff;
+  border-color: #b9d2f4;
+}
+.app-shell .document-item span {
+  font-size: 11px;
+}
+.app-shell .source-chunk {
+  font-size: 12px;
+  border-color: #78a7e9;
+}
+.app-shell .checkbox-label {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #5b708c;
+}
+.app-shell .modal {
+  width: min(760px, calc(100vw - 32px));
+  border-radius: 21px;
+  padding: 30px;
+  box-shadow: 0 24px 90px #0e24483b;
+}
+.app-shell .modal > header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 24px;
+}
+.app-shell .modal > header h2 {
+  font-size: 24px;
+}
+.app-shell .modal input,
+.app-shell .modal select,
+.app-shell .modal textarea {
+  font-size: 14px;
+  border-radius: 9px;
+}
+.app-shell .criteria-editor fieldset {
+  padding: 22px;
+  background: #f8faff;
+  border-color: #dce7f6;
+  border-radius: 14px;
+  margin: 24px 0;
+}
+.app-shell .criteria-editor legend {
+  color: #4873ad;
+  background: #e9f2ff;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+.app-shell .empty {
+  background: white;
+  border: 1px dashed #c9d9ee;
+  border-radius: 18px;
+  padding: 60px 24px;
+}
+.app-shell .empty h3 {
+  font-size: 20px;
+}
+.app-shell .empty p {
+  font-size: 13px;
+}
+.app-shell .app-footer {
+  color: #8a9ab0;
+  font-size: 11px;
+  border-top-color: #e5ecf5;
+}
+@media (min-width: 1600px) {
+  .app-shell .project-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1150px) {
+  .app-shell .sidebar {
+    width: 215px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .app-shell .workspace-content {
+    margin-left: 215px;
+  }
+  .app-shell .workspace-main {
+    padding: 28px;
+  }
+  .app-shell .app-header {
+    padding: 0 28px;
+  }
+  .app-shell .stat {
+    padding: 17px;
+  }
+  .app-shell .stat > div {
+    font-size: 11px;
+  }
+  .app-shell .stat > div > svg {
+    padding: 6px;
+  }
+  .app-shell .review-layout {
+    grid-template-columns: minmax(0, 1fr) 270px;
+    gap: 18px;
+  }
+  .app-shell .review-summary {
+    padding: 20px;
+  }
+  .app-shell .header-account > span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 950px) {
+  .app-shell .review-layout {
+    grid-template-columns: 1fr;
+  }
+  .app-shell .review-summary {
+    position: static;
+  }
+  .app-shell .project-grid {
+    grid-template-columns: 1fr;
+  }
+  .app-shell .overview-heading {
+    padding: 28px;
+  }
+  .app-shell .overview-heading h1 {
+    font-size: 34px;
+  }
+  .app-shell .stats-grid {
+    gap: 13px;
+  }
+}
+@media (max-width: 700px) {
+  .app-shell .sidebar {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: calc(74px + env(safe-area-inset-bottom));
+    padding: 5px 8px env(safe-area-inset-bottom);
+    border: 0;
+    border-top: 1px solid #e1eaf6;
+    background: #fffffffa;
+    backdrop-filter: blur(14px);
+    z-index: 40;
+  }
+  .app-shell .sidebar > .brand,
+  .app-shell .workspace-name,
+  .app-shell .nav-caption,
+  .app-shell .sidebar-bottom {
+    display: none;
+  }
+  .app-shell .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 3px;
+    width: 100%;
+  }
+  .app-shell .nav-item {
+    display: flex;
+    flex-direction: column;
+    padding: 9px 2px;
+    gap: 5px;
+    margin: 0;
+    min-height: 60px;
+    font-size: 10px;
+    border-radius: 10px;
+    color: #6d809a;
+    position: relative;
+  }
+  .app-shell .nav-item.active {
+    color: #2463d2;
+    background: #eaf3ff;
+    box-shadow: none;
+  }
+  .app-shell .nav-item .count {
+    top: 2px;
+    right: 12px;
+    margin: 0;
+    background: #2563eb;
+    color: white;
+  }
+  .app-shell .nav-item.active .count {
+    background: #2563eb;
+    color: white;
+  }
+  .app-shell .workspace-content {
+    margin-left: 0;
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+    width: 100%;
+  }
+  .app-shell .app-header {
+    height: 68px;
+    padding: 0 20px;
+    gap: 12px;
+  }
+  .app-shell .app-header .breadcrumbs {
+    font-size: 11px;
+    gap: 7px;
+    overflow: hidden;
+  }
+  .app-shell .app-header .header-actions {
+    gap: 10px;
+  }
+  .app-shell .header-account {
+    display: none;
+  }
+  .app-shell .mobile-signout {
+    display: inline-flex;
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+    color: #5a7699;
+  }
+  .app-shell .app-header .badge {
+    font-size: 8px;
+    padding: 5px 7px;
+  }
+  .app-shell .workspace-main {
+    padding: 22px 20px 30px;
+  }
+  .app-shell .overview-heading {
+    padding: 26px;
+    min-height: 235px;
+    border-radius: 18px;
+    gap: 20px;
+  }
+  .app-shell .overview-heading h1 {
+    font-size: 33px;
+  }
+  .app-shell .overview-heading p {
+    font-size: 13px;
+  }
+  .app-shell .overview-heading:after {
+    width: 220px;
+    height: 220px;
+    right: -100px;
+    top: -35px;
+    border-width: 25px;
+  }
+  .app-shell .overview-heading > .btn {
+    min-height: 41px;
+    font-size: 12px;
+    padding: 9px 15px;
+  }
+  .app-shell .page-heading h1 {
+    font-size: 28px;
+  }
+  .app-shell .page-heading p {
+    font-size: 13px;
+  }
+  .app-shell .stats-grid {
+    gap: 12px;
+    margin-bottom: 27px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .app-shell .stat {
+    padding: 16px;
+    border-radius: 13px;
+  }
+  .app-shell .stat > div {
+    font-size: 11px;
+    gap: 4px;
+  }
+  .app-shell .stat > div > svg {
+    display: block;
+    padding: 5px;
+    width: 15px;
+    height: 15px;
+  }
+  .app-shell .stat > strong {
+    font-size: 28px;
+    margin: 10px 0 7px;
+  }
+  .app-shell .stat > small {
+    font-size: 10px;
+  }
+  .app-shell .project-library-heading {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .app-shell .project-library-heading h2 {
+    font-size: 18px;
+  }
+  .app-shell .project-library-heading p {
+    font-size: 11px;
+    max-width: 210px;
+  }
+  .app-shell .project-library-heading > .badge {
+    white-space: nowrap;
+  }
+  .app-shell .list-toolbar {
+    gap: 10px;
+    margin: 18px 0;
+  }
+  .app-shell .project-card {
+    padding: 21px;
+    border-radius: 15px;
+  }
+  .app-shell .project-card h3 {
+    font-size: 18px;
+  }
+  .app-shell .project-card > p {
+    font-size: 12px;
+  }
+  .app-shell .project-card-bottom {
+    font-size: 10px;
+  }
+  .app-shell .project-collaborator {
+    gap: 6px;
+  }
+  .app-shell .workspace-tip {
+    padding: 18px;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .app-shell .workspace-tip strong {
+    font-size: 12px;
+  }
+  .app-shell .workspace-tip p {
+    font-size: 11px;
+  }
+  .app-shell .panel {
+    padding: 20px;
+    border-radius: 14px;
+  }
+  .app-shell .panel-heading {
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .app-shell .panel-heading h2 {
+    font-size: 16px;
+  }
+  .app-shell .project-people {
+    gap: 12px;
+    padding: 17px;
+  }
+  .app-shell .milestone-row {
+    padding: 18px;
+  }
+  .app-shell .milestone-row > div {
+    min-width: 150px;
+  }
+  .app-shell .milestone-row strong {
+    font-size: 13px;
+  }
+  .app-shell .milestone-row small {
+    font-size: 11px;
+  }
+  .app-shell .stepper {
+    padding: 15px;
+  }
+  .app-shell .stepper li {
+    font-size: 9px;
+    gap: 5px;
+    flex-direction: column;
+  }
+  .app-shell .stepper li:after {
+    display: none;
+  }
+  .app-shell .stepper li > span {
+    width: 26px;
+    height: 26px;
+    font-size: 10px;
+  }
+  .app-shell .review-summary {
+    padding: 22px;
+  }
+  .app-shell .review-summary .action-stack {
+    max-width: none;
+  }
+  .app-shell .report-score {
+    padding: 18px;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .app-shell .report-score > strong {
+    font-size: 32px;
+  }
+  .app-shell .evaluation-progress {
+    padding: 15px 17px;
+  }
+  .app-shell .evaluation-progress summary {
+    font-size: 12px;
+  }
+  .app-shell .evaluation-progress .badge {
+    font-size: 8px;
+  }
+  .app-shell .evaluation-events .evaluation-event {
+    font-size: 11px;
+  }
+  .app-shell .document-list {
+    grid-template-columns: 1fr;
+  }
+  .app-shell .document-upload {
+    padding: 16px;
+  }
+  .app-shell .inline-form {
+    flex-direction: column;
+  }
+  .app-shell .modal {
+    width: calc(100vw - 24px);
+    padding: 23px;
+    border-radius: 17px;
+    max-height: calc(100dvh - 24px);
+  }
+  .app-shell .modal > header h2 {
+    font-size: 22px;
+  }
+  .app-shell .criteria-editor fieldset {
+    padding: 17px;
+  }
+  .app-shell .app-footer {
+    padding: 18px 20px;
+    font-size: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell .project-card:hover {
+    transform: none;
+  }
+}
