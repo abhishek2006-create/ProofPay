@@ -18,6 +18,7 @@ import {
   LoaderCircle,
   LockKeyhole,
   LogOut,
+  PanelLeftClose,
   Plus,
   Search,
   Settings2,
@@ -27,6 +28,7 @@ import {
   X,
 } from 'lucide-react';
 import EvidenceGrid from './evidence-grid';
+import MilestoneGraph from './milestone-graph';
 import { api } from '@/lib/client-api';
 import {
   RequirementsDocuments,
@@ -67,6 +69,7 @@ function statusLabel(status: string) {
     .replace(/^./, (c) => c.toUpperCase());
 }
 export default function Workspace({ user }: { user: UserView }) {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [projects, setProjects] = useState<ProjectView[]>([]),
     [view, setView] = useState<View>('Projects'),
     [projectId, setProjectId] = useState<string | null>(null),
@@ -171,8 +174,16 @@ export default function Workspace({ user }: { user: UserView }) {
           : b.createdAt.localeCompare(a.createdAt),
     );
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <aside className="sidebar">
+        <button
+          className="icon-button sidebar-toggle"
+          aria-label={sidebarCollapsed ? 'Expand navigation' : 'Collapse navigation'}
+          aria-expanded={!sidebarCollapsed}
+          onClick={() => setSidebarCollapsed((value) => !value)}
+        >
+          <PanelLeftClose size={16} />
+        </button>
         <Link href="/" className="brand">
           <Layers3 size={27} />
           Proof<span className="blue">Pay</span>
@@ -856,6 +867,14 @@ function MilestonePanel({
           </li>
         ))}
       </ol>
+      <MilestoneGraph
+        milestone={m}
+        busy={busy}
+        canApprove={client && ['SUBMITTED', 'UNDER_REVIEW'].includes(m.status)}
+        onApprove={() =>
+          openModal({ type: 'decision', project: p, milestone: m, decision: 'ACCEPTED' })
+        }
+      />
       <div className="review-layout">
         <div className="review-main">
           <EvaluationProgress milestoneId={m.id} busy={busy} initialJob={m.evaluations?.[0]} />
@@ -1946,9 +1965,28 @@ function ModalForm({
                 private to this project. Uploaded files are treated as untrusted artifacts.
               </div>
               {modal.milestone.specifications[0].requirements.map((r) => (
-                <label className="upload-field" key={r.id}>
+                <label
+                  className="upload-field"
+                  key={r.id}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.currentTarget.classList.add('drag-over');
+                  }}
+                  onDragLeave={(event) => event.currentTarget.classList.remove('drag-over')}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    event.currentTarget.classList.remove('drag-over');
+                    const input = event.currentTarget.querySelector('input');
+                    if (input && event.dataTransfer.files.length) {
+                      input.files = event.dataTransfer.files;
+                      input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                  }}
+                >
+                  <Upload size={20} />
                   <strong>{r.description}</strong>
                   <small>{r.evidenceRequired}</small>
+                  <small>Drop evidence here or choose files</small>
                   <input
                     name={`file-${r.id}`}
                     type="file"

@@ -11,7 +11,31 @@ export async function rateLimit(key: string, limit = 30, windowMs = 60000) {
 }
 export function checkOrigin(req: Request) {
   const expected = new URL(process.env.APP_URL ?? 'http://localhost:3000').origin;
-  ensure(req.headers.get('origin') === expected, 403, 'Request origin is not permitted.');
+  const origin = req.headers.get('origin');
+  if (origin === expected) return;
+  // Development previews use both loopback names for the same local server.
+  // Keep production exact and never trust arbitrary Host/forwarded headers.
+  if (process.env.NODE_ENV !== 'production' && origin) {
+    try {
+      const configured = new URL(expected);
+      const incoming = new URL(origin);
+      const target = new URL(req.url);
+      const loopback = new Set(['localhost', '127.0.0.1', '[::1]']);
+      if (
+        incoming.origin === origin &&
+        [configured, incoming, target].every(
+          (url) =>
+            loopback.has(url.hostname) &&
+            url.protocol === configured.protocol &&
+            url.port === configured.port,
+        )
+      )
+        return;
+    } catch {
+      // Missing or malformed origins are rejected below.
+    }
+  }
+  ensure(false, 403, 'Request origin is not permitted.');
 }
 export async function jsonBody(req: Request) {
   ensure(Number(req.headers.get('content-length') ?? 0) < 200000, 413, 'Request is too large.');
