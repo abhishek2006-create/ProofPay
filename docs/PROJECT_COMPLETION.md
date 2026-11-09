@@ -2,6 +2,8 @@
 
 Status reviewed 10 November 2026 (India time).
 
+Latest provider choice: Grok via xAI (`grok-4.7`, `https://api.x.ai/v1`, strict JSON schema). Local and Render settings replace the earlier OpenAI chat configuration. xAI credentials and live checks are pending. Embeddings are disabled pending a separately configured provider; retrieval stays explicitly lexical. Render billing remains a separate blocker. See AI_RENDER_SETUP.md.
+
 ## Verified in this session
 
 `npm test -- tests/paypal.test.ts tests/payments-integration.test.ts`: 13 tests passed across two files. Payment integration tests use mocked PayPal HTTP and a real local PostgreSQL ledger. They do not prove a real sandbox transaction.

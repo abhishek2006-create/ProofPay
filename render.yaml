@@ -35,16 +35,17 @@ services:
       - key: AI_API_KEY
         sync: false
       - key: AI_PRETRAINED_MODEL
-        value: gpt-4.1-mini
+        value: grok-4.7
       - key: AI_BASE_URL
-        value: https://api.openai.com/v1
+        value: https://api.x.ai/v1
       - key: AI_RESPONSE_FORMAT
         value: json_schema
       - key: EMBEDDING_MODEL
-        value: text-embedding-3-small
+        value: ''
       - key: EMBEDDING_BASE_URL
-        value: https://api.openai.com/v1
-      # Embeddings reuse AI_API_KEY unless EMBEDDING_API_KEY is set separately.
+        value: ''
+      # Use lexical retrieval until a separate embedding provider is configured.
+      # Set its own EMBEDDING_API_KEY; do not send the xAI key to another provider.
       - key: RUNNER_SECURITY_APPROVED
         value: 'false'
       - key: ENABLE_DEMO
