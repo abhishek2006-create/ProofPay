@@ -2,6 +2,8 @@
 
 Status reviewed 10 November 2026 (India time).
 
+Full journey demonstrated: separate client/freelancer browser sessions, bilateral specification agreement, authorized GitHub URL submission pinned to commit d5c870a94ba27fe772fa2dc25f567e80dab2d0c6, deterministic file checks, real Groq review with validated evidence, client UI acceptance, PayPal buyer approval and client UI capture confirmation. Both roles displayed Paid, $1.00 USD, order `6BR5024492752110B`, capture `9YR14921FB361651G`. The evaluation was rerun through a diagnostic service call while resolving the issues discovered in the demo; the actual stored report is visible in the app. See [JOURNEY_DEMO.md](JOURNEY_DEMO.md) for the full replay, fixes and verification limits. All 70 backend tests and production build passed after the Unicode database and bounded-prompt fixes.
+
 Latest provider: Groq, matching the user's locally saved key (`openai/gpt-oss-20b`, `https://api.groq.com/openai/v1`, strict JSON schema). A real `npm run ai:check` passed on 10 November 2026, including response schema and evidence-reference validation on fictional input. Earlier OpenAI credit failures and pending xAI setup are superseded. Embeddings remain disabled pending a separately configured provider; retrieval stays explicitly lexical. Render billing remains a separate blocker. See AI_RENDER_SETUP.md.
 
 ## Verified in this session

@@ -23,7 +23,7 @@ A full-stack milestone acceptance workspace for clients and freelance developers
 - Optional consent-controlled Elastic criteria search and Zapier acceptance-event outbox.
 - Postman/Newman collection, Render blueprint, tests and demo fixtures.
 
-**Sandbox payment verified:** a real $1.00 USD order was approved in PayPal checkout and captured through ProofPay's payment service, with authoritative reconciliation to PAID and repeated-capture protection. See [the verification record](docs/PROJECT_COMPLETION.md) for references and scope. Application browser tests pass through acceptance and checkout availability; this payment used a dedicated service-layer fixture. **Not verified live:** signed webhook delivery, AI provider, Elastic, Zapier and hosted deployment.
+**Sandbox journey demonstrated:** separate client/freelancer sessions, bilateral agreement, a pinned GitHub submission, real Groq advisory review, client acceptance, PayPal buyer approval and client UI capture confirmation resulted in PAID for $1.00 USD, visible to both roles. See [the journey replay](docs/JOURNEY_DEMO.md) and [verification record](docs/PROJECT_COMPLETION.md) for scope and references. **Not verified live:** signed webhook delivery, semantic embeddings, isolated repository execution, Elastic, Zapier and hosted deployment. Static file checks do not prove runtime behavior.
 
 ## Stack
 

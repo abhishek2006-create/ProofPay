@@ -42,7 +42,9 @@ async function verifyAndPrepare(directory, port) {
     const existing = await admin.query("SELECT 1 FROM pg_database WHERE datname='proofpay'");
     if (!existing.rowCount) {
       try {
-        await admin.query('CREATE DATABASE proofpay');
+        await admin.query(
+          "CREATE DATABASE proofpay TEMPLATE template0 ENCODING 'UTF8' LC_COLLATE 'C' LC_CTYPE 'C'",
+        );
       } catch (error) {
         if (error?.code !== '42P04') throw error;
       }
@@ -98,6 +100,7 @@ export async function launchLocalDatabase({
     port,
     persistent: true,
     authMethod: 'scram-sha-256',
+    initdbFlags: ['--encoding=UTF8', '--locale=C'],
     postgresFlags: ['-h', '127.0.0.1'],
     onLog: record,
     onError: record,

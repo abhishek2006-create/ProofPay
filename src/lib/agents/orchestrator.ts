@@ -13,6 +13,7 @@ import {
 } from './repository-agent';
 import { scoreCriteria } from './scoring-agent';
 import { buildEvaluationReport } from './report-agent';
+import { repositoryReviewExcerpts } from '../ai-contract';
 export async function evaluateMilestone(user: Actor, id: string) {
   const m = await getMilestone(user, id);
   ensure(
@@ -165,7 +166,9 @@ export async function evaluateMilestone(user: Actor, id: string) {
           m.specifications[0].requirements,
           {
             retrievedSources: retrieval.chunks,
-            repository: repository.files,
+            repository: repositoryReviewExcerpts(repository.files),
+            repositoryContextScope:
+              'At most nine file excerpts, 800 characters per file. Truncated excerpts do not establish full-file or runtime correctness. Deterministic file-presence checks use the pinned repository tree.',
             testExecution: tests,
           },
         );

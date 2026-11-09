@@ -1,5 +1,11 @@
 # ProofPay RAG update - 2026-10-29
 
+## Complete journey demonstration — 2026-11-10
+
+Created separate browser sessions for a fictional client and freelancer, defined and bilaterally agreed a $1 milestone, submitted the authorized ProofPay GitHub branch and pinned it to commit d5c870a94ba27fe772fa2dc25f567e80dab2d0c6. Repository file-presence checks and a real Groq advisory report passed; the client accepted through the interface and initiated PayPal sandbox order 6BR5024492752110B. The user approved buyer checkout and confirmed the capture dialog. PayPal capture 9YR14921FB361651G completed; both roles displayed Paid for $1.00. See docs/JOURNEY_DEMO.md for the replay and scope.
+
+The demonstration found two issues that are now fixed: fresh Windows local clusters/databases explicitly use UTF8, with a Unicode preservation regression test; AI repository context now uses at most nine 800-character excerpts with truncation flags and a stated scope. Existing local records were copied to a new UTF8 database, with all 202 rows across 17 tables verified and the original retained. The old environment configuration remains ignored locally for recovery. Real Groq review then returned HTTP 200 and validated evidence references. All 70 backend tests, the production build, and targeted lint passed. Submitted repository runtime tests remain unavailable without an approved isolated runner.
+
 ## Sandbox payment verification — 2026-11-10
 
 Real PayPal sandbox OAuth, order creation, buyer checkout approval, capture and reconciliation succeeded for $1.00 USD. Order `3J0610705W951813G`, capture `8F465400JU890415B`, status PAID / COMPLETED. Repeating capture reused the existing paid transaction. The original India sandbox merchant rejected USD checkout with UNSUPPORTED_PAYEE_CURRENCY; an explicitly approved US sandbox merchant/app resolved the test configuration. Credentials remain in ignored .env. This was a service-layer fixture plus real buyer checkout, not a signed-in client UI payment demonstration. Actual webhook delivery and adverse payment scenarios remain pending.

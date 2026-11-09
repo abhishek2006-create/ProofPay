@@ -34,6 +34,15 @@ export const reviewInputSchema = z
   .strict();
 export type ReviewInput = z.infer<typeof reviewInputSchema>;
 export type ReviewReport = z.infer<typeof aiReviewSchema>;
+export function repositoryReviewExcerpts(
+  files: { path: string; sha: string; text: string; reference: string }[],
+) {
+  return files.slice(0, 9).map((file) => ({
+    ...file,
+    text: file.text.slice(0, 800),
+    truncated: file.text.length > 800,
+  }));
+}
 export function makeReviewInput(
   checks: CheckResult[],
   submissionNotes: string,

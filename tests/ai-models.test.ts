@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { aiModelConfig, publicAiConfig } from '../src/lib/ai-config';
 import { diagnoseAi, proposeCriteria, reviewChecksDetailed } from '../src/lib/ai';
+import { repositoryReviewExcerpts } from '../src/lib/ai-contract';
 const check = {
   requirementId: 'r1',
   status: 'not_verified' as const,
@@ -26,6 +27,23 @@ function configure() {
   vi.stubEnv('AI_CUSTOM_MODEL_APPROVED', 'false');
 }
 describe('model routing and diagnostics', () => {
+  it('bounds repository prompt excerpts while preserving their evidence references and truncation flags', () => {
+    const files = Array.from({ length: 12 }, (_, i) => ({
+      path: `src/file${i}.ts`,
+      sha: 'a'.repeat(40),
+      reference: `repo:commit:src/file${i}.ts`,
+      text: 'x'.repeat(16000),
+    }));
+    const excerpts = repositoryReviewExcerpts(files);
+    expect(excerpts.reduce((n, file) => n + file.text.length, 0)).toBeLessThanOrEqual(7200);
+    expect(excerpts).toHaveLength(9);
+    expect(excerpts[0]).toMatchObject({
+      reference: files[0].reference,
+      sha: files[0].sha,
+      truncated: true,
+    });
+    expect(files[0].text).toHaveLength(16000);
+  });
   it.each([
     ['Grok', 'grok-4.7', 'https://api.x.ai/v1'],
     ['Groq', 'openai/gpt-oss-20b', 'https://api.groq.com/openai/v1'],
