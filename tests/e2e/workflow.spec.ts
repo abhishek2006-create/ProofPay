@@ -133,10 +133,21 @@ test('full browser workflow: account → agreement → evidence → revisions �
     .fill('Reviewed corrected content and accepted the artifact.');
   await page.getByRole('dialog').getByRole('checkbox').last().check();
   await page.getByRole('button', { name: 'Confirm acceptance' }).click();
-  await expect(page.getByRole('button', { name: /Continue to PayPal sandbox/ })).toBeDisabled();
-  await expect(
-    page.getByText('Sandbox credentials are missing. Checkout is unavailable.'),
-  ).toBeVisible();
+  const settingsResponse = await page.request.get('/api/v1/settings');
+  expect(settingsResponse.ok()).toBe(true);
+  const settings = await settingsResponse.json();
+  const checkoutButton = page.getByRole('button', { name: /Continue to PayPal sandbox/ });
+  if (settings.services.paypal) {
+    await expect(checkoutButton).toBeEnabled();
+    await expect(
+      page.getByText('Sandbox credentials are missing. Checkout is unavailable.'),
+    ).toHaveCount(0);
+  } else {
+    await expect(checkoutButton).toBeDisabled();
+    await expect(
+      page.getByText('Sandbox credentials are missing. Checkout is unavailable.'),
+    ).toBeVisible();
+  }
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: 'test-results/review-desktop.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
@@ -152,10 +163,12 @@ test('full browser workflow: account → agreement → evidence → revisions �
 });
 test('public pages, sign-in and access boundaries', async ({ page, request }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /Great work deserves/ })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: /Every payment should have proof/ }),
+  ).toBeVisible();
   await page.screenshot({ path: 'test-results/landing-desktop.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect(page.getByRole('link', { name: /Get started/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Start Verifying' })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -169,26 +182,25 @@ test('public pages, sign-in and access boundaries', async ({ page, request }) =>
   });
   expect(badOrigin.status()).toBe(403);
 });
-test('model settings show truthful placeholder state and no browser training controls', async ({
+test('model settings reflect server configuration and expose no browser training controls', async ({
   page,
 }) => {
-  await page.goto('/signin');
-  await page
-    .getByRole('textbox', { name: 'Email address', exact: true })
-    .fill('client@proofpay.example');
-  await page.getByLabel('Password', { exact: true }).fill('Demo-Only-Password-2026!');
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-  await expect(page).toHaveURL(/dashboard/);
+  await register(page, `settings-${Date.now()}@example.test`, 'Settings test client', 'CLIENT');
   await page.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'Verification model', exact: true }),
   ).toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Test model with fictional evidence' }),
-  ).toBeDisabled();
+  const settingsResponse = await page.request.get('/api/v1/settings');
+  expect(settingsResponse.ok()).toBe(true);
+  const settings = await settingsResponse.json();
+  const diagnostic = page.getByRole('button', { name: 'Test model with fictional evidence' });
+  if (settings.aiModel.configured) await expect(diagnostic).toBeEnabled();
+  else {
+    await expect(diagnostic).toBeDisabled();
+    await expect(page.getByText(settings.aiModel.reason, { exact: true })).toBeVisible();
+  }
   await expect(
     page.getByText('Requirements RAG → repository inspection → scoring → report', { exact: true }),
   ).toBeVisible();
-  await expect(page.getByText('Pretrained model name is missing.', { exact: true })).toBeVisible();
   await page.screenshot({ path: 'test-results/model-settings.png', fullPage: true });
 });

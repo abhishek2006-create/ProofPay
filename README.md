@@ -23,7 +23,7 @@ A full-stack milestone acceptance workspace for clients and freelance developers
 - Optional consent-controlled Elastic criteria search and Zapier acceptance-event outbox.
 - Postman/Newman collection, Render blueprint, tests and demo fixtures.
 
-**Not verified live:** PayPal, AI provider, Elastic, Zapier and hosted deployment. Credentials were intentionally left as placeholders. The local end-to-end flow is tested through acceptance; payment code is tested using explicitly mocked PayPal responses plus a real PostgreSQL ledger. Do not represent those tests as real sandbox transactions.
+**Sandbox payment verified:** a real $1.00 USD order was approved in PayPal checkout and captured through ProofPay's payment service, with authoritative reconciliation to PAID and repeated-capture protection. See [the verification record](docs/PROJECT_COMPLETION.md) for references and scope. Application browser tests pass through acceptance and checkout availability; this payment used a dedicated service-layer fixture. **Not verified live:** signed webhook delivery, AI provider, Elastic, Zapier and hosted deployment.
 
 ## Stack
 
@@ -128,6 +128,8 @@ Follow [docs/PAYPAL_SANDBOX.md](docs/PAYPAL_SANDBOX.md). Start with the official
 All ten requested tools were evaluated against current official hackathon sponsor pages. AG Grid Community, Postman artifacts and Render deployment configuration are included; Elastic and Zapier have optional server integrations. APIMatic context tooling, Astropods, Bryntum and KERNEL are documented as deferred or access-dependent; Channel3 is excluded because retail product discovery does not serve this workflow. No unimplemented tool is advertised as integrated. See [docs/SPONSOR_TOOLS.md](docs/SPONSOR_TOOLS.md).
 
 ## Deploy with Render
+
+For the selected OpenAI-compatible provider and Render configuration, follow [AI_RENDER_SETUP.md](docs/AI_RENDER_SETUP.md). It covers chat and embedding settings, secret entry, provider checks, deployment, and actual webhook verification.
 
 Push original source to your repository, connect that repository to Render and review `render.yaml`. It provisions a Node web service and managed PostgreSQL. Review current plans and costs first; no credits or free tier are assumed. Set APP_URL and NEXTAUTH_URL to the resulting HTTPS origin, configure server secrets, keep ENABLE_DEMO=false, and run migrations via the pre-deploy command. Health is `/api/v1/health`. Add optional AI_BASE_URL/Elastic/Zapier variables only when needed.
 

@@ -1,5 +1,11 @@
 # ProofPay RAG update - 2026-10-29
 
+## Sandbox payment verification — 2026-11-10
+
+Real PayPal sandbox OAuth, order creation, buyer checkout approval, capture and reconciliation succeeded for $1.00 USD. Order `3J0610705W951813G`, capture `8F465400JU890415B`, status PAID / COMPLETED. Repeating capture reused the existing paid transaction. The original India sandbox merchant rejected USD checkout with UNSUPPORTED_PAYEE_CURRENCY; an explicitly approved US sandbox merchant/app resolved the test configuration. Credentials remain in ignored .env. This was a service-layer fixture plus real buyer checkout, not a signed-in client UI payment demonstration. Actual webhook delivery and adverse payment scenarios remain pending.
+
+Current checks: all 67 backend tests, all three Chromium browser workflows, five API smoke requests / six assertions, lint, typecheck, production build and 60 deterministic evaluation cases passed. Browser assertions now match the current landing page and both checkout configuration states; model-settings testing creates its own account. Local PostgreSQL was restarted without resetting data. Production preview is on localhost:3001. See [the current completion record](docs/PROJECT_COMPLETION.md); older configuration statements below describe earlier sessions. Live AI/embeddings, isolated execution and hosting still require external configuration.
+
 ## Local database launcher fix - 2026-10-29
 
 Repeated `npm run db:local` now verifies and reuses the existing cluster on port 5438 rather than trying to spawn a second PostgreSQL process. It checks the actual data directory and application-database readiness, does not take ownership of an existing server, and reports native startup diagnostics even when the embedded library rejects without an Error. Database paths resolve relative to the launcher, and existing files are preserved on failure. Verified against the already-running development database and three targeted regression tests, including a fresh temporary cluster, repeated launches with persistent test data, foreign-service/directory rejection and undefined native errors. Typecheck and lint passed. The original development database was not stopped or reset.
