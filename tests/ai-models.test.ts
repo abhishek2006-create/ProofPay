@@ -26,34 +26,42 @@ function configure() {
   vi.stubEnv('AI_CUSTOM_MODEL_APPROVED', 'false');
 }
 describe('model routing and diagnostics', () => {
-  it('routes a Grok review to xAI with strict schema and the selected provider key', async () => {
-    configure();
-    vi.stubEnv('AI_PRETRAINED_MODEL', 'grok-4.7');
-    vi.stubEnv('AI_BASE_URL', 'https://api.x.ai/v1');
-    vi.stubEnv('AI_API_KEY', 'xai-fixture-only');
-    const fetch = vi.fn<typeof globalThis.fetch>(async () =>
-      Response.json({
-        model: 'grok-4.7',
-        choices: [
-          {
-            finish_reason: 'stop',
-            message: { content: JSON.stringify({ summary: 'Missing evidence', results: [check] }) },
-          },
-        ],
-      }),
-    );
-    vi.stubGlobal('fetch', fetch);
-    const result = await reviewChecksDetailed([check], 'Fictional test only');
-    expect(fetch).toHaveBeenCalledOnce();
-    const [url, request] = fetch.mock.calls[0];
-    expect(url).toBe('https://api.x.ai/v1/chat/completions');
-    expect(request?.headers).toMatchObject({ Authorization: 'Bearer xai-fixture-only' });
-    const body = JSON.parse(request!.body as string);
-    expect(body.model).toBe('grok-4.7');
-    expect(body.response_format.json_schema.strict).toBe(true);
-    expect(result.metadata.model).toBe('grok-4.7');
-    expect(JSON.stringify(publicAiConfig())).not.toContain('xai-fixture-only');
-  });
+  it.each([
+    ['Grok', 'grok-4.7', 'https://api.x.ai/v1'],
+    ['Groq', 'openai/gpt-oss-20b', 'https://api.groq.com/openai/v1'],
+  ])(
+    'routes a %s review with strict schema and the selected provider key',
+    async (_provider, model, baseUrl) => {
+      configure();
+      vi.stubEnv('AI_PRETRAINED_MODEL', model);
+      vi.stubEnv('AI_BASE_URL', baseUrl);
+      vi.stubEnv('AI_API_KEY', 'provider-fixture-only');
+      const fetch = vi.fn<typeof globalThis.fetch>(async () =>
+        Response.json({
+          model,
+          choices: [
+            {
+              finish_reason: 'stop',
+              message: {
+                content: JSON.stringify({ summary: 'Missing evidence', results: [check] }),
+              },
+            },
+          ],
+        }),
+      );
+      vi.stubGlobal('fetch', fetch);
+      const result = await reviewChecksDetailed([check], 'Fictional test only');
+      expect(fetch).toHaveBeenCalledOnce();
+      const [url, request] = fetch.mock.calls[0];
+      expect(url).toBe(`${baseUrl}/chat/completions`);
+      expect(request?.headers).toMatchObject({ Authorization: 'Bearer provider-fixture-only' });
+      const body = JSON.parse(request!.body as string);
+      expect(body.model).toBe(model);
+      expect(body.response_format.json_schema.strict).toBe(true);
+      expect(result.metadata.model).toBe(model);
+      expect(JSON.stringify(publicAiConfig())).not.toContain('provider-fixture-only');
+    },
+  );
   it('ignores retired custom settings and uses only pretrained inference', () => {
     configure();
     vi.stubEnv('AI_VERIFIER_MODE', 'custom');

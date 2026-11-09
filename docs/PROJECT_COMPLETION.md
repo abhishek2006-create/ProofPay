@@ -2,7 +2,7 @@
 
 Status reviewed 10 November 2026 (India time).
 
-Latest provider choice: Grok via xAI (`grok-4.7`, `https://api.x.ai/v1`, strict JSON schema). Local and Render settings replace the earlier OpenAI chat configuration. xAI credentials and live checks are pending. Embeddings are disabled pending a separately configured provider; retrieval stays explicitly lexical. Render billing remains a separate blocker. See AI_RENDER_SETUP.md.
+Latest provider: Groq, matching the user's locally saved key (`openai/gpt-oss-20b`, `https://api.groq.com/openai/v1`, strict JSON schema). A real `npm run ai:check` passed on 10 November 2026, including response schema and evidence-reference validation on fictional input. Earlier OpenAI credit failures and pending xAI setup are superseded. Embeddings remain disabled pending a separately configured provider; retrieval stays explicitly lexical. Render billing remains a separate blocker. See AI_RENDER_SETUP.md.
 
 ## Verified in this session
 
@@ -59,9 +59,9 @@ A finished sandbox prototype can explicitly defer optional Elastic/Zapier integr
 
 ## Resources
 
-Current external blockers: OpenAI reports exhausted API credits; Render's initial Blueprint plan reports `need_payment_info`. The restricted provider key is saved locally and expires 10 December 2026. Source is pushed to `codex/proofpay-sandbox-render` (initial preparation commit `eb80f11`). Render Blueprint `exs-dbp20t8m7kps738kpjp0` is created with automatic syncing disabled, but no sync or deployment was approved. Resume planning this Blueprint after billing setup.
+Current external blocker: Render's initial Blueprint plan reports `need_payment_info`. Groq's live fictional diagnostic passed; the earlier OpenAI credit blocker no longer applies to the selected provider. Source is pushed to `codex/proofpay-sandbox-render` (initial preparation commit `eb80f11`). Render Blueprint `exs-dbp20t8m7kps738kpjp0` is created with automatic syncing disabled, but no sync or deployment was approved. Resume planning this Blueprint after billing setup.
 
-- Selected AI provider and Render preparation: [AI_RENDER_SETUP.md](AI_RENDER_SETUP.md). Blueprint includes chat/embedding settings, PostgreSQL 17 and current plan identifiers. Validation against Render's current public JSON Schema passed, including corrected string-valued boolean environment settings. Render is connected and My Workspace is confirmed; no existing web service or database was found. A restricted provider key is saved locally, but live tests are blocked by exhausted API credits (HTTP 429, `credit_balance_exhausted` / `insufficient_quota`). No live AI success is claimed.
+- Selected AI provider and Render preparation: [AI_RENDER_SETUP.md](AI_RENDER_SETUP.md). Blueprint includes Groq chat settings, explicit lexical retrieval, PostgreSQL 17 and current plan identifiers. Validation against Render's public JSON Schema passed before the string-valued provider switch. Render is connected and My Workspace is confirmed; no existing web service or database was found. Groq's live fictional diagnostic and 12 mocked AI tests passed, as did typecheck. This does not establish full application AI quality or live embeddings.
 
 - PayPal sandbox accounts and testing: https://developer.paypal.com/sandbox-testing/overview
 - REST authentication: https://developer.paypal.com/api/rest/authentication/
