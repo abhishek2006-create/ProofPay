@@ -1,6 +1,6 @@
 # AI provider and Render deployment
 
-Prepared 10 November 2026. Files are ready for review; live AI and hosted deployment have not run. The successful PayPal sandbox payment is recorded in PROJECT_COMPLETION.md.
+Prepared 10 November 2026. Provider checks were attempted but failed for insufficient API credits; hosted deployment has not run. The successful PayPal sandbox payment is recorded in PROJECT_COMPLETION.md.
 
 ## Selected provider configuration
 
@@ -41,7 +41,9 @@ Once the HTTPS service is reachable, register `<origin>/api/v1/paypal-webhook` o
 
 - Restricted provider key created with explicit approval, saved in ignored .env, and expiring 10 December 2026. Only chat-completion and embedding requests are enabled. The fictional model diagnostic failed; the embedding check returned HTTP 429 with `credit_balance_exhausted` / `insufficient_quota`. No live AI or embedding success is claimed. Account funding must be completed by the user before retesting.
 - Render access is connected and My Workspace is confirmed. Service and PostgreSQL discovery found no existing resources; this will be a new deployment.
-- Hosting plan price and source publication: review before provisioning/deploying.
+- Source published on `codex/proofpay-sandbox-render` at commit `eb80f11`; main and aditya were not changed. Secrets and local session fixtures are excluded.
+- Blueprint `exs-dbp20t8m7kps738kpjp0` (ProofPay sandbox demo) was created with autoSync=false. Initial planning failed with `need_payment_info` for the web service and database. No sync was approved and no paid web/database resources were provisioned. Add billing information in the confirmed Render workspace, then replan this existing Blueprint instead of creating another.
+- Hosting plan price and the resulting infrastructure plan still require review before applying deployment.
 - Public origin and actual webhook registration: pending hosting.
 - Runtime repository tests: still unavailable until an approved isolated runner exists. Configuring AI does not enable code execution.
 

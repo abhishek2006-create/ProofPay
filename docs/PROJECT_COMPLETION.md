@@ -57,6 +57,8 @@ A finished sandbox prototype can explicitly defer optional Elastic/Zapier integr
 
 ## Resources
 
+Current external blockers: OpenAI reports exhausted API credits; Render's initial Blueprint plan reports `need_payment_info`. The restricted provider key is saved locally and expires 10 December 2026. Source is pushed to `codex/proofpay-sandbox-render` (initial preparation commit `eb80f11`). Render Blueprint `exs-dbp20t8m7kps738kpjp0` is created with automatic syncing disabled, but no sync or deployment was approved. Resume planning this Blueprint after billing setup.
+
 - Selected AI provider and Render preparation: [AI_RENDER_SETUP.md](AI_RENDER_SETUP.md). Blueprint includes chat/embedding settings, PostgreSQL 17 and current plan identifiers. Validation against Render's current public JSON Schema passed, including corrected string-valued boolean environment settings. Render is connected and My Workspace is confirmed; no existing web service or database was found. A restricted provider key is saved locally, but live tests are blocked by exhausted API credits (HTTP 429, `credit_balance_exhausted` / `insufficient_quota`). No live AI success is claimed.
 
 - PayPal sandbox accounts and testing: https://developer.paypal.com/sandbox-testing/overview
