@@ -10,7 +10,9 @@ import {
 } from '../src/lib/projects';
 import { submitEvidence, verifySubmission, decide } from '../src/lib/submissions';
 import { createOrder } from '../src/lib/payments';
-const enabled = Boolean(process.env.DATABASE_URL);
+const enabled = Boolean(
+  process.env.DATABASE_URL && process.env.AI_SERVICE_URL && process.env.AI_SERVICE_TOKEN,
+);
 const createdIds: string[] = [];
 afterAll(async () => {
   await db.$disconnect();

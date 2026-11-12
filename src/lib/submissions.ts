@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { db } from './db';
 import { ensure } from './errors';
 import { audit, assertClient, getMilestone, type Actor } from './projects';
-import { resolveRepository } from './agents/repository-agent';
+import { resolveWithPython } from './python-service';
 
 export function inspectFile(file: { name: string; type: string }, bytes: Uint8Array) {
   ensure(
@@ -64,7 +64,7 @@ export async function submitEvidence(user: Actor, id: string, form: FormData) {
       400,
       'Confirm authorization to inspect this repository.',
     );
-    pinned = await resolveRepository(
+    pinned = await resolveWithPython(
       m.projectId,
       repositoryUrl,
       String(form.get('repositoryRef') ?? '').trim(),

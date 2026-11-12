@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack --hostname 127.0.0.1",
+    "dev:python": "node scripts/dev-python.mjs",
+    "dev": "node scripts/dev-python.mjs",
     "build": "prisma generate && next build --webpack",
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
@@ -19,7 +20,9 @@
     "format": "prettier --write src tests scripts prisma/seed.ts docs *.ts *.mjs *.json *.md *.yml",
     "evaluate": "tsx scripts/evaluate.ts",
     "ai:check": "tsx scripts/ai-check.ts",
-    "rag:status": "tsx scripts/rag-status.ts"
+    "rag:status": "tsx scripts/rag-status.ts",
+    "dev:web": "next dev --webpack --hostname 127.0.0.1",
+    "repository:check": "tsx scripts/repository-check.ts"
   },
   "dependencies": {
     "@elastic/elasticsearch": "^9.2.0",

@@ -5,14 +5,8 @@ import { getMilestone, audit, type Actor } from '../projects';
 import { runChecks } from '../verification';
 import { aiConfigured, reviewChecksDetailed } from '../ai';
 import { retrieveRequirements } from './requirements-agent';
-import {
-  inspectRepository,
-  executeIsolatedTests,
-  runnerConfigured,
-  type RepositoryAnalysis,
-} from './repository-agent';
-import { scoreCriteria } from './scoring-agent';
 import { buildEvaluationReport } from './report-agent';
+import { evaluateWithPython } from '../python-service';
 export async function evaluateMilestone(user: Actor, id: string) {
   const m = await getMilestone(user, id);
   ensure(
@@ -96,46 +90,32 @@ export async function evaluateMilestone(user: Actor, id: string) {
         ? `Inspecting pinned commit ${submission.commitSha}.`
         : 'No repository was submitted; using uploaded artifacts only.',
     );
-    let repository: RepositoryAnalysis;
-    try {
-      repository = await inspectRepository(m.projectId, submission);
-    } catch {
-      repository = {
-        status: 'UNAVAILABLE',
+    const checks = runChecks(m.specifications[0].requirements, submission.evidence);
+    await progress(
+      'PYTHON_EVALUATION_RUNNING',
+      'Python is inspecting the pinned repository and requesting approved isolated tests.',
+    );
+    const evaluation = await evaluateWithPython({
+      requestId: job.id,
+      projectId: m.projectId,
+      submissionId: submission.id,
+      specificationVersion: m.currentVersion,
+      submission: {
         repositoryUrl: submission.repositoryUrl,
         commitSha: submission.commitSha,
         treeSha: submission.treeSha,
-        paths: [],
-        files: [],
-        languages: [],
-        frameworks: [],
-        testFiles: [],
-        scripts: {},
-        limitations: [
-          'GitHub inspection failed or access could not be authorized. No repository tests were inferred as passed.',
-        ],
-      };
-    }
-    await progress(
-      runnerConfigured() && repository.status === 'INSPECTED'
-        ? 'TESTS_RUNNING'
-        : 'TEST_EXECUTION_UNAVAILABLE',
-      runnerConfigured()
-        ? 'Requesting the configured isolated test service.'
-        : 'No approved isolated runner is configured; no submitted code is executed on this host.',
-    );
-    const tests = await executeIsolatedTests(
-      repository,
-      m.specifications[0].requirements
-        .filter((r) => r.method === 'SANDBOX_TEST')
-        .map((r) => r.expected),
-    );
+      },
+      requirements: m.specifications[0].requirements,
+      checks,
+    });
+    const repository = evaluation.repository;
+    const tests = evaluation.tests;
+    const scoring = evaluation.scoring;
+    repository.limitations.push(...evaluation.limitations);
     await progress(
       'EVIDENCE_BEING_EVALUATED',
       `Artifact checks executed. Isolated test status: ${tests.status}.`,
     );
-    const checks = runChecks(m.specifications[0].requirements, submission.evidence);
-    const scoring = scoreCriteria(m.specifications[0].requirements, checks, repository, tests);
     const normalized = scoring.criteria.map((c) => ({
       requirementId: c.criterionId,
       status:
@@ -189,6 +169,7 @@ export async function evaluateMilestone(user: Actor, id: string) {
     const report = JSON.parse(
       JSON.stringify(
         buildEvaluationReport({
+          evaluationEngine: 'python',
           project: { id: project.id, title: project.title },
           milestone: m,
           submission,

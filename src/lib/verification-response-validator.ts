@@ -1,5 +1,25 @@
-import type { CheckResult } from '../validation';
-import type { RepositoryAnalysis, TestExecution } from './repository-agent';
+// Defense-in-depth checks only. This module never runs a verification job.
+export function safeRepositoryPath(path: string) {
+  return (
+    path.length > 0 &&
+    path.length <= 500 &&
+    !/[\x00-\x1f\x7f]/.test(path) &&
+    !path.startsWith('/') &&
+    !path.includes('\\') &&
+    !path.includes('..') &&
+    !/\.(pem|key|p12|pfx)$/i.test(path) &&
+    !path
+      .split('/')
+      .some((part) =>
+        /^(\.env(?:\.|$)|node_modules$|vendor$|\.git$|\.venv$|dist$|build$|coverage$|id_rsa|credentials(?:\.|$)|secrets?(?:\.|$))/i.test(
+          part,
+        ),
+      )
+  );
+}
+import type { CheckResult } from './validation';
+import type { RepositoryAnalysis, TestExecution } from './python-service';
+
 export type CriterionInput = {
   id: string;
   description: string;
@@ -23,7 +43,7 @@ export type CriterionEvaluation = {
   missingFunctionality: string | null;
   recommendedImprovement: string;
 };
-export function scoreCriteria(
+export function recomputeExpectedScores(
   requirements: CriterionInput[],
   checks: CheckResult[],
   repo: RepositoryAnalysis,
@@ -37,12 +57,22 @@ export function scoreCriteria(
     let evidence = check?.evidenceIds ?? [],
       explanation = check?.explanation ?? 'No executed verification supports this criterion.',
       testResult = 'No runtime test supports this judgment.';
+    if (r.method === 'MANUAL') {
+      status = 'UNVERIFIED';
+      score = null;
+      explanation = 'Human review is required.';
+    }
     if (r.method === 'REPO_FILE') {
+      evidence = [];
       if (repo.status !== 'INSPECTED') {
         status = repo.status === 'UNAVAILABLE' ? 'BLOCKED' : 'UNVERIFIED';
         score = null;
         explanation =
           'A pinned accessible repository is required for this file-presence criterion.';
+      } else if (!safeRepositoryPath(r.expected)) {
+        status = 'UNVERIFIED';
+        score = null;
+        explanation = 'This path is excluded from safe inspection; absence is not proven.';
       } else if (repo.paths.includes(r.expected)) {
         status = 'PASS';
         score = 10;
@@ -61,6 +91,7 @@ export function scoreCriteria(
       }
     }
     if (r.method === 'SANDBOX_TEST') {
+      evidence = [];
       const suite = tests.suites.find((s) => s.id === r.expected);
       if (tests.status !== 'COMPLETED') {
         status = 'BLOCKED';
@@ -120,9 +151,9 @@ export function scoreCriteria(
               : 'Supply sufficient evidence and perform the missing human or automated review.',
     };
   });
-  return { criteria, ...weightedScore(criteria) };
+  return { criteria, ...validateWeightedScore(criteria) };
 }
-export function weightedScore(
+export function validateWeightedScore(
   criteria: Pick<CriterionEvaluation, 'weight' | 'status' | 'score'>[],
 ) {
   if (
@@ -142,7 +173,7 @@ export function weightedScore(
   const verifiedWeight = verified.reduce((n, c) => n + c.weight, 0);
   return {
     scoreOutOf10: verified.length
-      ? Math.round((100 * criteria.reduce((n, c) => n + (c.score ?? 0) * c.weight, 0)) / total) /
+      ? Math.round((100 * verified.reduce((n, c) => n + (c.score ?? 0) * c.weight, 0)) / total) /
         100
       : null,
     verifiedWeightPercent: Math.round((10000 * verifiedWeight) / total) / 100,
