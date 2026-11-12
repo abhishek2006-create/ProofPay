@@ -1,7 +1,8 @@
-import type { CriterionEvaluation } from './scoring-agent';
-import type { RepositoryAnalysis, TestExecution } from './repository-agent';
+import type { CriterionEvaluation } from '../verification-response-validator';
+import type { RepositoryAnalysis, TestExecution } from '../python-service';
 import type { RetrievedChunk } from './requirements-agent';
 export function buildEvaluationReport(input: {
+  evaluationEngine?: 'python';
   project: { id: string; title: string };
   milestone: { id: string; title: string; currentVersion: number };
   submission: { id: string; createdAt: Date };
@@ -23,6 +24,7 @@ export function buildEvaluationReport(input: {
   const cases = input.tests.suites.flatMap((s) => s.cases);
   return {
     schemaVersion: 1,
+    evaluationEngine: input.evaluationEngine ?? 'python',
     generatedAt: new Date().toISOString(),
     project: { ...input.project, client: input.client, freelancer: input.freelancer },
     milestone: {

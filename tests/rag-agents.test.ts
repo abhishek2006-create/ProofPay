@@ -2,15 +2,11 @@ import 'dotenv/config';
 import { afterAll, afterEach, describe, it, expect, vi } from 'vitest';
 import JSZip from 'jszip';
 import { parseDocument, chunkSections } from '../src/lib/document-parser';
-import { weightedScore, scoreCriteria } from '../src/lib/agents/scoring-agent';
 import {
-  parseGithubUrl,
-  safeRepositoryPath,
-  resolveRepository,
-  inspectRepository,
-  executeIsolatedTests,
-  type RepositoryAnalysis,
-} from '../src/lib/agents/repository-agent';
+  validateWeightedScore as weightedScore,
+  recomputeExpectedScores as scoreCriteria,
+} from '../src/lib/verification-response-validator';
+import type { RepositoryAnalysis } from '../src/lib/python-service';
 import {
   uploadRequirements,
   retrieveRequirements,
@@ -27,8 +23,7 @@ afterEach(() => {
 });
 afterAll(() => db.$disconnect());
 const sha = 'a'.repeat(40),
-  tree = 'b'.repeat(40),
-  blob = 'c'.repeat(40);
+  tree = 'b'.repeat(40);
 const repo: RepositoryAnalysis = {
   status: 'INSPECTED',
   repositoryUrl: 'https://github.com/example/demo',
@@ -175,113 +170,11 @@ describe('document parsing and deterministic evidence boundaries', () => {
     );
     expect(result.criteria[0]).toMatchObject({ status: 'PARTIAL', score: 5 });
   });
-  it('rejects non-GitHub URLs and excludes secret files', () => {
-    for (const url of [
-      'http://github.com/x/y',
-      'https://github.com.evil/x/y',
-      'https://github.com/x/y?token=x',
-      'https://user:secret@github.com/x/y',
-    ])
-      expect(() => parseGithubUrl(url)).toThrow();
-    for (const path of [
-      '.env.local',
-      'src/.env.production',
-      'secrets.json',
-      'src/id_rsa',
-      'key.pem',
-      'node_modules/a.js',
-      '../x',
-    ])
-      expect(safeRepositoryPath(path)).toBe(false);
-    expect(safeRepositoryPath('src/index.ts')).toBe(true);
-  });
-  it('pins a GitHub ref, inspects only fixed API hosts, and never fetches secrets or runs scripts', async () => {
-    const fetch = vi.fn(async (url: string | URL | Request) => {
-      const path = String(url);
-      if (path.endsWith('/repos/example/demo'))
-        return Response.json({ full_name: 'example/demo', private: false });
-      if (path.includes('/commits/'))
-        return Response.json({ sha, commit: { tree: { sha: tree } } });
-      if (path.includes('/git/trees/'))
-        return Response.json({
-          sha: tree,
-          truncated: false,
-          tree: [
-            { path: 'package.json', type: 'blob', mode: '100644', sha: blob, size: 70 },
-            { path: '.env.local', type: 'blob', mode: '100644', sha: 'd'.repeat(40), size: 30 },
-          ],
-        });
-      return Response.json({
-        sha: blob,
-        encoding: 'base64',
-        size: 70,
-        content: Buffer.from(
-          JSON.stringify({ dependencies: { react: '1' }, scripts: { test: 'untrusted-command' } }),
-        ).toString('base64'),
-      });
-    });
-    vi.stubGlobal('fetch', fetch);
-    const pinned = await resolveRepository('p', repo.repositoryUrl!, 'main');
-    expect(pinned.commitSha).toBe(sha);
-    const result = await inspectRepository('p', pinned);
-    expect(result.paths).toEqual(['package.json']);
-    expect(result.frameworks).toContain('React');
-    expect(result.scripts.test).toBe('untrusted-command');
-    vi.stubEnv('RUNNER_SECURITY_APPROVED', 'false');
-    expect((await executeIsolatedTests(result, ['test'])).status).toBe(
-      'TEST_EXECUTION_UNAVAILABLE',
-    );
-    expect(fetch.mock.calls.every((c) => String(c[0]).startsWith('https://api.github.com/'))).toBe(
-      true,
-    );
-    expect(fetch).toHaveBeenCalledTimes(5);
-  });
-  it('requires per-project private repository permission', async () => {
-    vi.stubEnv('GITHUB_PRIVATE_PROJECT_REPOS_JSON', JSON.stringify({ allowed: ['example/demo'] }));
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => Response.json({ full_name: 'example/demo', private: true })),
-    );
-    await expect(resolveRepository('other', repo.repositoryUrl!, 'main')).rejects.toThrow(
-      'specific project',
-    );
-  });
-  it('rejects a runner report for a different commit and trusts no passing cases', async () => {
-    vi.stubEnv('RUNNER_SECURITY_APPROVED', 'true');
-    vi.stubEnv('REPOSITORY_RUNNER_URL', 'https://runner.example/run');
-    vi.stubEnv('REPOSITORY_RUNNER_TOKEN', 'fixture');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () =>
-        Response.json({
-          commitSha: 'e'.repeat(40),
-          status: 'COMPLETED',
-          isolation: {
-            nonRoot: true,
-            network: 'disabled',
-            productionSecrets: false,
-            privileged: false,
-            hostSocket: false,
-            sourceReadOnly: true,
-            cpuLimit: 2,
-            memoryMb: 2048,
-            timeoutSeconds: 90,
-            diskMb: 1024,
-          },
-          commands: [
-            { command: 'test', kind: 'test', exitCode: 0, durationMs: 1, stdout: '', stderr: '' },
-          ],
-          suites: [{ id: 'test', cases: [{ name: 'a', status: 'pass' }] }],
-        }),
-      ),
-    );
-    expect(await executeIsolatedTests(repo, ['test'])).toMatchObject({
-      status: 'SETUP_FAILED',
-      suites: [],
-    });
-  });
 });
-describe.skipIf(!process.env.DATABASE_URL)('real PostgreSQL RAG workflow', () => {
+
+describe.skipIf(
+  !(process.env.DATABASE_URL && process.env.AI_SERVICE_URL && process.env.AI_SERVICE_TOKEN),
+)('real PostgreSQL RAG workflow', () => {
   it('isolates documents, retrieves real stored vectors, persists reports and rejects without payment', async () => {
     vi.stubEnv('AI_API_KEY', '');
     vi.stubEnv('EMBEDDING_API_KEY', '');
@@ -422,6 +315,7 @@ describe.skipIf(!process.env.DATABASE_URL)('real PostgreSQL RAG workflow', () =>
         .id,
     );
     await submitEvidence(freelancer, m.id, evidence);
+    vi.unstubAllGlobals();
     const run = await verifySubmission(client, m.id);
     const report = run.report as {
       overall: { scoreOutOf10: number | null };

@@ -1,13 +1,17 @@
 import 'dotenv/config';
-import { resolveRepository, inspectRepository } from '../src/lib/agents/repository-agent';
+import { resolveWithPython, inspectWithPython } from '../src/lib/python-service';
 async function main() {
   const [url, ref = 'HEAD', projectId = 'public-read-only-check'] = process.argv.slice(2);
   if (!url)
     throw new Error(
       'Usage: npx tsx scripts/repository-check.ts https://github.com/owner/repo [ref] [authorized-project-id]',
     );
-  const pinned = await resolveRepository(projectId, url, ref);
-  const result = await inspectRepository(projectId, pinned);
+  const pinned = await resolveWithPython(projectId, url, ref);
+  const result = await inspectWithPython(projectId, {
+    repositoryUrl: pinned.repositoryUrl,
+    commitSha: pinned.commitSha,
+    treeSha: pinned.treeSha,
+  });
   console.log(
     JSON.stringify(
       {
