@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './cinematic.css';
 export const metadata: Metadata = {
   title: 'ProofPay — Clear work. Confident payments.',
   description: 'Evidence-backed milestone acceptance and PayPal sandbox payments.',

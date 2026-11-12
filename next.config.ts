@@ -21,7 +21,7 @@ const config: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.sandbox.paypal.com",
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.sketchfab.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; frame-src https://sketchfab.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://www.sandbox.paypal.com",
           },
         ],
       },

@@ -6,14 +6,14 @@ import type { RequirementView, ResultView } from '@/lib/ui-types';
 ModuleRegistry.registerModules([AllCommunityModule]);
 type Row = { id: string; description: string; method: string; status: string; evidence: number };
 const theme = themeQuartz.withParams({
-  accentColor: '#2563eb',
-  backgroundColor: '#ffffff',
-  foregroundColor: '#14213d',
-  borderColor: '#e6edf5',
-  headerBackgroundColor: '#f8faff',
-  headerTextColor: '#64748b',
-  fontFamily: 'Arial, sans-serif',
-  fontSize: 13,
+  accentColor: '#aac2dc',
+  backgroundColor: '#101722',
+  foregroundColor: '#d8e3f1',
+  borderColor: '#2c3c52',
+  headerBackgroundColor: '#192437',
+  headerTextColor: '#a3b7d1',
+  fontFamily: 'Segoe UI, Arial, sans-serif',
+  fontSize: 14,
   rowHeight: 64,
   headerHeight: 44,
   wrapperBorderRadius: 12,
