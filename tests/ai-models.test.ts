@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { aiModelConfig, publicAiConfig } from '../src/lib/ai-config';
 import { diagnoseAi, proposeCriteria, reviewChecksDetailed } from '../src/lib/ai';
+import { repositoryReviewExcerpts } from '../src/lib/ai-contract';
 const check = {
   requirementId: 'r1',
   status: 'not_verified' as const,
@@ -14,6 +15,9 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 function configure() {
+  vi.stubEnv('AI_PRETRAINED_MODEL', '');
+  vi.stubEnv('AI_BASE_URL', 'https://api.openai.com/v1');
+  vi.stubEnv('AI_RESPONSE_FORMAT', 'json_schema');
   vi.stubEnv('AI_API_KEY', 'fixture-secret');
   vi.stubEnv('AI_MODEL', 'pretrained-fixture');
   vi.stubEnv('AI_VERIFIER_MODE', 'pretrained');
@@ -23,6 +27,59 @@ function configure() {
   vi.stubEnv('AI_CUSTOM_MODEL_APPROVED', 'false');
 }
 describe('model routing and diagnostics', () => {
+  it('bounds repository prompt excerpts while preserving their evidence references and truncation flags', () => {
+    const files = Array.from({ length: 12 }, (_, i) => ({
+      path: `src/file${i}.ts`,
+      sha: 'a'.repeat(40),
+      reference: `repo:commit:src/file${i}.ts`,
+      text: 'x'.repeat(16000),
+    }));
+    const excerpts = repositoryReviewExcerpts(files);
+    expect(excerpts.reduce((n, file) => n + file.text.length, 0)).toBeLessThanOrEqual(7200);
+    expect(excerpts).toHaveLength(9);
+    expect(excerpts[0]).toMatchObject({
+      reference: files[0].reference,
+      sha: files[0].sha,
+      truncated: true,
+    });
+    expect(files[0].text).toHaveLength(16000);
+  });
+  it.each([
+    ['Grok', 'grok-4.7', 'https://api.x.ai/v1'],
+    ['Groq', 'openai/gpt-oss-20b', 'https://api.groq.com/openai/v1'],
+  ])(
+    'routes a %s review with strict schema and the selected provider key',
+    async (_provider, model, baseUrl) => {
+      configure();
+      vi.stubEnv('AI_PRETRAINED_MODEL', model);
+      vi.stubEnv('AI_BASE_URL', baseUrl);
+      vi.stubEnv('AI_API_KEY', 'provider-fixture-only');
+      const fetch = vi.fn<typeof globalThis.fetch>(async () =>
+        Response.json({
+          model,
+          choices: [
+            {
+              finish_reason: 'stop',
+              message: {
+                content: JSON.stringify({ summary: 'Missing evidence', results: [check] }),
+              },
+            },
+          ],
+        }),
+      );
+      vi.stubGlobal('fetch', fetch);
+      const result = await reviewChecksDetailed([check], 'Fictional test only');
+      expect(fetch).toHaveBeenCalledOnce();
+      const [url, request] = fetch.mock.calls[0];
+      expect(url).toBe(`${baseUrl}/chat/completions`);
+      expect(request?.headers).toMatchObject({ Authorization: 'Bearer provider-fixture-only' });
+      const body = JSON.parse(request!.body as string);
+      expect(body.model).toBe(model);
+      expect(body.response_format.json_schema.strict).toBe(true);
+      expect(result.metadata.model).toBe(model);
+      expect(JSON.stringify(publicAiConfig())).not.toContain('provider-fixture-only');
+    },
+  );
   it('ignores retired custom settings and uses only pretrained inference', () => {
     configure();
     vi.stubEnv('AI_VERIFIER_MODE', 'custom');

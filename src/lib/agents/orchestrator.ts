@@ -145,7 +145,9 @@ export async function evaluateMilestone(user: Actor, id: string) {
           m.specifications[0].requirements,
           {
             retrievedSources: retrieval.chunks,
-            repository: repository.files,
+            repository: repositoryReviewExcerpts(repository.files),
+            repositoryContextScope:
+              'At most nine file excerpts, 800 characters per file. Truncated excerpts do not establish full-file or runtime correctness. Deterministic file-presence checks use the pinned repository tree.',
             testExecution: tests,
           },
         );

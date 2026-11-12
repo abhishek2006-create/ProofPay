@@ -16,7 +16,11 @@ The sandbox buyer pays the configured merchant ID. The merchant may represent th
 
 Create and capture requests use durable request IDs derived from the payment UUID. Retries reuse the same logical order. Duplicate webhooks are verified then deduplicated. Reconciliation fetches current PayPal state rather than trusting a frontend redirect, event order, or user-submitted amount. A capture lease limits simultaneous requests. An unresolved creation attempt older than five hours needs operator investigation. Replacement of expired orders is not automatic; this avoids accidentally creating a second charge after an uncertain outcome.
 
-## Required live checks (blocked: placeholders requested)
+## Current live verification
+
+On 10 November 2026, real sandbox OAuth, order creation, separate buyer approval, completed capture, reconciliation and repeated capture protection succeeded for $1.00 USD. Order `3J0610705W951813G`; capture `8F465400JU890415B`. The initial India merchant returned UNSUPPORTED_PAYEE_CURRENCY; a US test Business account and its REST app resolved this test configuration. This demonstrates sandbox merchant receipt, not escrow or freelancer payout. See [PROJECT_COMPLETION.md](PROJECT_COMPLETION.md) for scope and remaining checks.
+
+## Live checklist
 
 - OAuth exchange with real sandbox credentials.
 - Create order and verify buyer/merchant are separate accounts.

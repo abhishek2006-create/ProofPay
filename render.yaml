@@ -2,7 +2,7 @@ services:
   - type: web
     name: proofpay
     runtime: node
-    plan: starter
+    plan: 0.5c-512mb
     buildCommand: npm ci && npm run build
     preDeployCommand: npm run db:migrate
     startCommand: npm start
@@ -39,12 +39,26 @@ services:
         sync: false
       - key: AI_API_KEY
         sync: false
-      - key: AI_MODEL
-        sync: false
+      - key: AI_PRETRAINED_MODEL
+        value: openai/gpt-oss-20b
+      - key: AI_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: AI_RESPONSE_FORMAT
+        value: json_schema
+      - key: EMBEDDING_MODEL
+        value: ''
+      - key: EMBEDDING_BASE_URL
+        value: ''
+      # Use lexical retrieval until a separate embedding provider is configured.
+      # Set its own EMBEDDING_API_KEY; do not send the Groq key to another provider.
+      - key: RUNNER_SECURITY_APPROVED
+        value: 'false'
       - key: ENABLE_DEMO
-        value: false
+        value: 'false'
 databases:
   - name: proofpay-db
-    plan: basic-256mb
+    plan: 0.1c-256mb
+    postgresMajorVersion: '17'
+    ipAllowList: []
     databaseName: proofpay
     user: proofpay

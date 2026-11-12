@@ -50,13 +50,14 @@ describe('local database launcher', () => {
       owner = await launchLocalDatabase({ databaseDir: directory, port, log: () => {} });
       expect(owner.started).toBe(true);
       await client.connect();
+      expect((await client.query('SHOW server_encoding')).rows[0].server_encoding).toBe('UTF8');
       await client.query('CREATE TABLE launcher_preservation (value text)');
-      await client.query("INSERT INTO launcher_preservation VALUES ('keep this data')");
+      await client.query("INSERT INTO launcher_preservation VALUES ('keep this data ← ✓ नमस्ते')");
       const reused = await launchLocalDatabase({ databaseDir: directory, port, log: () => {} });
       expect(reused.started).toBe(false);
       await reused.stop();
       expect((await client.query('SELECT value FROM launcher_preservation')).rows[0].value).toBe(
-        'keep this data',
+        'keep this data ← ✓ नमस्ते',
       );
       await expect(
         launchLocalDatabase({
