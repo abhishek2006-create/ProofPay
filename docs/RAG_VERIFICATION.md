@@ -2,7 +2,7 @@
 
 ## Existing application and scope
 
-ProofPay remains the existing Next.js App Router/React/TypeScript application, with Auth.js sessions, PostgreSQL/Prisma, AG Grid, immutable specification versions, private evidence, audit events, and PayPal Orders v2 sandbox checkout. The light-blue workspace and sign-in/sign-out remain. No new application or model training service is required.
+ProofPay remains the existing Next.js App Router/React/TypeScript application, with Auth.js sessions, PostgreSQL/Prisma, AG Grid, immutable specification versions, private evidence, audit events, and PayPal Orders v2 sandbox checkout. The light-blue workspace and sign-in/sign-out remain. The Python verification service is required for evaluation.
 
 The active path is **requirements document → source retrieval → client-edited criteria and bilateral agreement → pinned GitHub submission and/or artifact upload → repository inspection → isolated tests when configured → deterministic weighted score → stored advisory report → client decision → optional tip → separate PayPal sandbox approval/capture**.
 
@@ -14,8 +14,8 @@ Fine-tuning, LoRA scripts, dataset preparation, model comparison, custom-model s
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/lib/document-parser.ts`           | PDF page text, DOCX paragraphs and UTF-8 Markdown/TXT lines, bounded parsing and source locations                                                         |
 | `src/lib/agents/requirements-agent.ts` | Client-authorized uploads, real provider embeddings, project/milestone-filtered retrieval, exact source-linked AI criterion proposals                     |
-| `src/lib/agents/repository-agent.ts`   | GitHub URL validation, private-project authorization, ref resolution, immutable commit/tree and bounded blobs, static structure, optional isolated runner |
-| `src/lib/agents/scoring-agent.ts`      | Evidence-driven PASS/PARTIAL/FAIL/UNVERIFIED/BLOCKED and deterministic weighted score                                                                     |
+| `ai-service/app/agents/github_agent.py` | GitHub resolution, authorization and pinned source inspection |
+| `ai-service/app/agents/evaluation_agent.py` | Evidence-driven evaluation and deterministic weighted scoring |
 | `src/lib/agents/report-agent.ts`       | Detailed report with provenance, scope, counts, output, missing evidence and human-review limitations                                                     |
 | `src/lib/agents/orchestrator.ts`       | Persisted evaluation stages, one active run per milestone, stale-lease recovery, optimistic concurrency and report history                                |
 
@@ -53,10 +53,10 @@ Open http://localhost:3000. Seeded demo accounts are client@proofpay.example and
 | EMBEDDING_MODEL                                                               | Actual embedding model identifier; blank disables semantic indexing                                                                     |
 | EMBEDDING_API_KEY                                                             | Embedding key, falls back to AI_API_KEY                                                                                                 |
 | EMBEDDING_BASE_URL                                                            | Compatible embeddings endpoint base, falls back to AI_BASE_URL then OpenAI v1                                                           |
-| GITHUB_TOKEN                                                                  | Optional server-only token for rate limits/private authorized repositories; least-privilege read-only access                            |
-| GITHUB_PRIVATE_PROJECT_REPOS_JSON                                             | Explicit operator mapping, e.g. `{"project-id":["owner/repo"]}`; project consent alone never unlocks an operator's private repositories |
-| REPOSITORY_RUNNER_URL, REPOSITORY_RUNNER_TOKEN                                | Optional dedicated execution service HTTPS URL and authentication                                                                       |
-| RUNNER_SECURITY_APPROVED                                                      | Must explicitly be `true` after reviewing the separate runner's isolation                                                               |
+| GITHUB_TOKEN (Python)                                                                  | Optional server-only token for rate limits/private authorized repositories; least-privilege read-only access                            |
+| GITHUB_PRIVATE_PROJECT_REPOS_JSON (Python)                                             | Explicit operator mapping, e.g. `{"project-id":["owner/repo"]}`; project consent alone never unlocks an operator's private repositories |
+| REPOSITORY_RUNNER_URL, REPOSITORY_RUNNER_TOKEN (Python)                                | Optional dedicated execution service HTTPS URL and authentication                                                                       |
+| RUNNER_SECURITY_APPROVED (Python)                                                      | Must explicitly be `true` after reviewing the separate runner's isolation                                                               |
 | PAYPAL_ENV                                                                    | Must remain `sandbox`                                                                                                                   |
 | PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_MERCHANT_ID, PAYPAL_WEBHOOK_ID | Existing PayPal sandbox configuration                                                                                                   |
 
@@ -66,45 +66,11 @@ Keep credentials in ignored `.env` or deployment secrets, never browser code or 
 
 No clone, package install, build, test, subprocess or repository setup command runs on the ProofPay host. GitHub files, READMEs, scripts and setup instructions are untrusted data. Static inspection never proves runtime success. Without a separately deployed and operator-approved isolated runner, reports explicitly show `TEST_EXECUTION_UNAVAILABLE`; SANDBOX_TEST criteria are BLOCKED and no test pass counts are claimed.
 
-An operator may implement a service accepting POST to REPOSITORY_RUNNER_URL with Bearer REPOSITORY_RUNNER_TOKEN. The request body contains `contractVersion:1`, canonical `repositoryUrl`, pinned `commitSha`, agreed suite IDs, and limits `{network:"disabled",timeoutSeconds:90,memoryMb:2048,cpuLimit:2,diskMb:1024}`. It excludes app, PayPal and GitHub credentials and excludes arbitrary setup commands. Private checkout must use the runner's own separately authorized access mechanism; app tokens are never forwarded.
+Runtime verification now uses the Python service and **runner contract v2**. Configure `AI_SERVICE_URL` and `AI_SERVICE_TOKEN` on Next.js, and the approved remote runner URL/token plus `RUNNER_TRUSTED_SUITES_JSON` on Python. Start local development with `npm run dev` after installing the service dependencies.
 
-The service must acquire the exact commit in a separate trusted preparation phase, provision dependencies without giving code production secrets, then execute in an ephemeral non-root container/VM with network disabled, read-only source, writable bounded scratch disk, CPU/RAM/time limits, no privileged mode, no Docker/host socket, no host filesystem mounts and no production service access. Resolve agreed suite IDs against an operator-controlled execution policy. Kill the entire process group/container on timeout and destroy the workspace. Merely returning the attestation below does not establish isolation: audit the service implementation before enabling it. The project provides the strict adapter, not a deployed runner or a claim that remote infrastructure is secure.
+See [the service documentation](../ai-service/README.md#secure-runner-integration-contract-v2) and `ai-service/app/schemas/verification.py` for the current contract. Every response must match a fresh request ID, project, repository, commit and tree. Each agreed suite must identify an operator-owned immutable test bundle and its recorded command. Legacy v1 results are disabled; they cannot earn points. Isolation declarations are validated but do not independently establish infrastructure security. A separately provisioned, operator-audited runner remains required.
 
-Example response shape (illustrative protocol, never a live report):
-
-```json
-{
-  "commitSha": "<40-character pinned commit>",
-  "status": "COMPLETED",
-  "isolation": {
-    "nonRoot": true,
-    "network": "disabled",
-    "productionSecrets": false,
-    "privileged": false,
-    "hostSocket": false,
-    "sourceReadOnly": true,
-    "cpuLimit": 2,
-    "memoryMb": 2048,
-    "timeoutSeconds": 90,
-    "diskMb": 1024
-  },
-  "commands": [
-    {
-      "command": "<recorded command>",
-      "kind": "test",
-      "exitCode": 0,
-      "durationMs": 123,
-      "stdout": "<actual output>",
-      "stderr": ""
-    }
-  ],
-  "suites": [
-    { "id": "<agreed suite ID>", "cases": [{ "name": "<actual test name>", "status": "pass" }] }
-  ]
-}
-```
-
-Allowed execution statuses: COMPLETED, SETUP_FAILED, TIMEOUT. Case statuses: pass/fail/skip. Command kinds: test/build/lint/typecheck. Caps: 12 commands, 30 suites, 500 cases/suite, 10KB stdout/stderr per command; response <300KB. Wrong commit, missing isolation, duplicate suites, contradictory failed test exits and all-passing suites, malformed output and timeouts produce SETUP_FAILED without trusted passing cases. Only agreed suite IDs contribute to scores. Known server secrets and bearer values are redacted from recorded command/output. Never put secrets in repository source or test names; arbitrary embedded secrets cannot be detected reliably.
+The implementation lives in [`repository-runner`](../repository-runner) and is deployed on its own Docker-capable host.
 
 ## Scores and report semantics
 

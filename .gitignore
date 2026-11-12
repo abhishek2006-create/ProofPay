@@ -13,3 +13,6 @@ test-results/
 .venv-training/
 training/__pycache__/
 *.pyc
+.venv/
+__pycache__/
+.pytest_cache/

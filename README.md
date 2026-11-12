@@ -58,6 +58,9 @@ npm run db:migrate
 $env:ENABLE_DEMO = 'true'
 npm run db:seed
 Remove-Item Env:ENABLE_DEMO
+# One-time Python setup (Windows)
+python -m venv ai-service/.venv
+ai-service/.venv/Scripts/python.exe -m pip install -r ai-service/requirements.txt
 npm run dev
 ```
 
@@ -145,3 +148,8 @@ Deployment is **not performed** without an account/repository connection. Before
 Artifact checks validate supplied files, not a live website. Arbitrary external URLs and uploaded code are not executed. Remote browser verification is deferred pending an isolated runner. Agreed scope changes require a new milestone; project editing/deletion and self-service data deletion are not implemented. Payment order expiry replacement, partial refunds, disputes, password recovery, email verification, public hosting, public repository, video and Devpost submission require additional work or account setup. See the explicit operational and live-verification checklist in BUILD_STATUS.
 
 Original source is MIT; third-party packages keep their respective licenses. No proprietary sponsor components or unlicensed visual assets are bundled.
+# Python verification integration
+
+Run `npm run dev` after installing `ai-service/requirements.txt` in a Python virtual environment to start Next.js with its required Python verification service. See [ai-service/README.md](ai-service/README.md) for setup, authenticated endpoints, the remote runner v2 contract, tests and limitations. Repository code is never executed on the application host. An external approved runner and trusted test bundles are required for runtime verification.
+
+The runner implementation is in [repository-runner](repository-runner). Deploy it on a separate Docker-capable host and configure its URL, token and project suites in `ai-service/.env`.
